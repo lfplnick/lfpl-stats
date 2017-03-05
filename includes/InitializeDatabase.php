@@ -5,6 +5,42 @@ ini_set('display_errors', 1);
 
 # Todo - We need to check if MySQL driver is installed during install process.
 
+
+class InitializeDatabase {
+
+    /**
+     * @var string $dbName Name of database to be initialized
+     */
+    private $dbName;
+
+    /**
+     * @var PDO $db Connection to database
+     */
+    private $db;
+
+    /**
+     * @var string $adminUsername Username for database administrative account
+     */
+    private $adminUsername;
+
+    /**
+     * @var string $adminPassword Password for database administrative account
+     */
+    private $adminPassword;
+
+    /**
+     * @var string $statsUsername Username for application's database account
+     */
+    private $statsUsername;
+
+    /**
+     * @var string $statsPassword Password for application's database account
+     */
+    private $statsPassword;
+
+}
+
+
 if (!isset($_POST["admin-user"])) {
     http_response_code(403);
     echo("Must supply username");
