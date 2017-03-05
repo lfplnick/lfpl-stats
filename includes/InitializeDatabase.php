@@ -5,16 +5,21 @@ ini_set('display_errors', 1);
 
 # Todo - We need to check if MySQL driver is installed during install process.
 
-if (!isset($_POST["user"])) {
+if (!isset($_POST["admin-user"])) {
     http_response_code(403);
     echo("Must supply username");
     exit;
 }
 
-if (!isset($_POST["pw"])) {
+if (!isset($_POST["admin-pw"])) {
     http_response_code(403);
     echo("Must supply password");
     exit;
+}
+
+$setStatsUser = true;
+if (!isset($_POST["stats-user"]) || ( !isset( $_POST['stats-pw'] ) ) ) {
+    $setStatsUser = false;
 }
 
 if (!isset($_POST["db"])) {
@@ -23,26 +28,44 @@ if (!isset($_POST["db"])) {
     exit;
 }
 
-$username = $_POST["user"];
-$password = $_POST["pw"];
+$adminUsername = $_POST["admin-user"];
+$adminPassword = $_POST["admin-pw"];
+
+if ( $setStatsUser ) {
+    $statsUsername = $_POST["stats-user"];
+    $statsPassword = $_POST['stats-pw'];
+}
+
 $dbName = $_POST["db"];
 
 
 try {
-    $db = new PDO("mysql:host=localhost", $username, $password);
+    $db = new PDO("mysql:host=localhost", $adminUsername, $adminPassword);
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    CreateDatabase($db, $dbName);
 } catch (PDOException $e) {
-    echo 'Connection failed: ' . $e->getMessage();
+    die( "Connection failed: {$e->getMessage()}" );
 } catch (Exception $e) {
-    echo 'Unhandled exception: ' . $e->getMessage();
+    die( "Unhandled exception: {$e->getMessage()}" );
+}
+
+try {
+    createDatabase($db, $dbName);
+} catch (PDOException $e) {
+    die( "Unable to create database: {$e->getMessage()}" );
+}
+
+try {
+    $db = new PDO("mysql:host=localhost;dbname={$dbName}", $adminUsername, $adminPassword);
+    createUser($db, $statsUsername, $statsPassword, $dbName);
+} catch (PDOException $e) {
+    die( "Unable to create new user: {$e->getMessage()}" );
 }
 
 $db = null;
 
 
 
-function CreateDatabase(PDO $conn, $dbName) {
+function createDatabase(PDO $conn, $dbName) {
     #$sql = "CREATE DATABASE {$dbName}";
     $sql = file_get_contents("tables.sql");
     $sql = str_replace(':db_name', $dbName, $sql);
@@ -50,10 +73,25 @@ function CreateDatabase(PDO $conn, $dbName) {
     $result = $conn->exec($sql);
     #$hasResults = $statement->execute();
     
-    var_dump($result);
+    echo 'Database created' . var_dump($result);
     #if (!$hasResults) {
     #    echo "Couldn't execute SQL to create database.";
     #}
 
     #echo 'Database created successfully';
+}
+
+function createUser( PDO $conn, $user, $password, $dbName ) {
+    $createSql = "CREATE USER '{$user}'@'%' IDENTIFIED BY '{$password}';";
+    $createResult = $conn->exec( $createSql );
+
+    echo 'Create SQL:<br/>';
+    var_dump($createResult);
+
+    # should translate to "GRANT ALL PRIVILEGES ON `lfpl_stats`.* TO 'statsuser'@'%';"
+    $grantSql = "GRANT ALL PRIVILEGES ON * TO '{$user}'@'%';";
+    $grantResult = $conn->exec( $grantSql );
+
+    echo 'Grant SQL:<br/>';
+    var_dump( $grantResult );
 }
