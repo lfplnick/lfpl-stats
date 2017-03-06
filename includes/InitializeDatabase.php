@@ -40,14 +40,15 @@ class InitializeDatabase {
 
 
     /**
-     * Connect to database specified by dbName.
+     * Connect to database on localhost specified by dbName.
      *
+     * @param string $dbName Name of database to connect to.
      * @return bool Returns true if connection is successful.
      */
-    private function connectToDatabase() {
+    private function connectToDatabase( $dbName = '' ) {
         $connectionString = 'mysql:host=localhost';
-        if ( isset( $this->dbName ) ) {
-            $connectionString .= ";dbName={$this->dbName}";
+        if ( $dbName !== '' ) ) {
+            $connectionString .= ";dbName={$dbName}";
         }
 
         $this->conn = new PDO( $connectionString, $this->adminUsername, $this->adminPassword );
@@ -62,8 +63,10 @@ class InitializeDatabase {
      * @return bool Returns true if database is created successfully.
      */
     public function createDatabase() {
+        $this->connectToDatabase();
+
         $sql = file_get_contents("tables.sql");
-        $sql = str_replace(':db_name', $dbName, $sql);
+        $sql = str_replace(':db_name', $this->dbName, $sql);
 
         $result = $conn->exec($sql);
         return $result
@@ -76,13 +79,15 @@ class InitializeDatabase {
     *  correct permissions.
     */
    public function createUser() {
-        $createSql = "CREATE USER '{$user}'@'%' IDENTIFIED BY '{$password}';";
-        $createResult = $conn->exec( $createSql );
+        $this->connectToDatabase($this->dbName);
+
+        $createSql = "CREATE USER '{$this->statsUsername}'@'%' IDENTIFIED BY '{$this->statsPassword}';";
+        $createResult = $this->conn->exec( $createSql );
         $createSuccess = ( $createResult === 0 );
 
         if ( $createSuccess ) {
-            $grantSql = "GRANT ALL PRIVILEGES ON * TO '{$user}'@'%';";
-            $grantResult = $conn->exec( $grantSql );
+            $grantSql = "GRANT ALL PRIVILEGES ON * TO '{$this->user}'@'%';";
+            $grantResult = $this->conn->exec( $grantSql );
             $grantSuccess = ( $grantResult === 0 );
         }
 
@@ -91,7 +96,7 @@ class InitializeDatabase {
 }
 
 
-}
+
 
 
 if (!isset($_POST["admin-user"])) {
