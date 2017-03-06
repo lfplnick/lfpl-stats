@@ -38,6 +38,42 @@ class InitializeDatabase {
      */
     private $statsPassword;
 
+
+    /**
+     * Actually creates the database
+     *
+     * @return bool Returns true if database is created successfully.
+     */
+    public function createDatabase() {
+        $sql = file_get_contents("tables.sql");
+        $sql = str_replace(':db_name', $dbName, $sql);
+
+        $result = $conn->exec($sql);
+        return $result
+    }
+
+   /**
+    * Creates user which will interact on behalf of the application.
+    *
+    * @return bool Returns true if user is created successfully and granted
+    *  correct permissions.
+    */
+   public function createUser() {
+        $createSql = "CREATE USER '{$user}'@'%' IDENTIFIED BY '{$password}';";
+        $createResult = $conn->exec( $createSql );
+        $createSuccess = ( $createResult === 0 );
+
+        if ( $createSuccess ) {
+            $grantSql = "GRANT ALL PRIVILEGES ON * TO '{$user}'@'%';";
+            $grantResult = $conn->exec( $grantSql );
+            $grantSuccess = ( $grantResult === 0 );
+        }
+
+        return $createSuccess && $grantSuccess;
+    }
+}
+
+
 }
 
 
@@ -101,33 +137,4 @@ $db = null;
 
 
 
-function createDatabase(PDO $conn, $dbName) {
-    #$sql = "CREATE DATABASE {$dbName}";
-    $sql = file_get_contents("tables.sql");
-    $sql = str_replace(':db_name', $dbName, $sql);
 
-    $result = $conn->exec($sql);
-    #$hasResults = $statement->execute();
-    
-    echo 'Database created' . var_dump($result);
-    #if (!$hasResults) {
-    #    echo "Couldn't execute SQL to create database.";
-    #}
-
-    #echo 'Database created successfully';
-}
-
-function createUser( PDO $conn, $user, $password, $dbName ) {
-    $createSql = "CREATE USER '{$user}'@'%' IDENTIFIED BY '{$password}';";
-    $createResult = $conn->exec( $createSql );
-
-    echo 'Create SQL:<br/>';
-    var_dump($createResult);
-
-    # should translate to "GRANT ALL PRIVILEGES ON `lfpl_stats`.* TO 'statsuser'@'%';"
-    $grantSql = "GRANT ALL PRIVILEGES ON * TO '{$user}'@'%';";
-    $grantResult = $conn->exec( $grantSql );
-
-    echo 'Grant SQL:<br/>';
-    var_dump( $grantResult );
-}
