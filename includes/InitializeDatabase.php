@@ -14,9 +14,9 @@ class InitializeDatabase {
     private $dbName;
 
     /**
-     * @var PDO $db Connection to database
+     * @var PDO $conn Connection to database
      */
-    private $db;
+    private $conn;
 
     /**
      * @var string $adminUsername Username for database administrative account
@@ -38,6 +38,23 @@ class InitializeDatabase {
      */
     private $statsPassword;
 
+
+    /**
+     * Connect to database specified by dbName.
+     *
+     * @return bool Returns true if connection is successful.
+     */
+    private function connectToDatabase() {
+        $connectionString = 'mysql:host=localhost';
+        if ( isset( $this->dbName ) ) {
+            $connectionString .= ";dbName={$this->dbName}";
+        }
+
+        $this->conn = new PDO( $connectionString, $this->adminUsername, $this->adminPassword );
+        $this->conn->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+
+        return true;
+    }
 
     /**
      * Actually creates the database
@@ -112,8 +129,8 @@ $dbName = $_POST["db"];
 
 
 try {
-    $db = new PDO("mysql:host=localhost", $adminUsername, $adminPassword);
-    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $conn = new PDO("mysql:host=localhost", $adminUsername, $adminPassword);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
     die( "Connection failed: {$e->getMessage()}" );
 } catch (Exception $e) {
@@ -121,19 +138,19 @@ try {
 }
 
 try {
-    createDatabase($db, $dbName);
+    createDatabase($conn, $dbName);
 } catch (PDOException $e) {
     die( "Unable to create database: {$e->getMessage()}" );
 }
 
 try {
-    $db = new PDO("mysql:host=localhost;dbname={$dbName}", $adminUsername, $adminPassword);
-    createUser($db, $statsUsername, $statsPassword, $dbName);
+    $conn = new PDO("mysql:host=localhost;dbname={$dbName}", $adminUsername, $adminPassword);
+    createUser($conn, $statsUsername, $statsPassword, $dbName);
 } catch (PDOException $e) {
     die( "Unable to create new user: {$e->getMessage()}" );
 }
 
-$db = null;
+$conn = null;
 
 
 
