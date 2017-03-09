@@ -1,4 +1,9 @@
-<?php include 'components/head.php' ?>
+<?php 
+    $pageTitle = "Stat Tracker";
+ 
+    include 'components/head.php';
+    include 'mock-data.php';
+?>
     <body class="no-top-pad">
 <?php include 'components/old-browser-warn.php' ?>
 
@@ -6,9 +11,8 @@
     <!-- Main jumbotron for a primary marketing message or call to action -->
     <div class="jumbotron">
       <div class="container">
-        <h1 class="text-center">Stat Tracker 3000</h1>
-        <p>This is a template for a simple marketing or informational website. It includes a large callout called a jumbotron and three supporting pieces of content. Use it as a starting point to create something more unique.</p>
-        <p><a class="btn btn-primary btn-lg" href="#" role="button">Learn more &raquo;</a></p>
+        <h1 class="text-center" style="border-bottom: #000 3pt solid">Stat Tracker 3000</h1>
+        <h2 class="text-center"><?php echo $desk; ?> | <?php echo $branch; ?></h3>
       </div>
     </div>
 
