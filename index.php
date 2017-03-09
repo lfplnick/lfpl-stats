@@ -12,7 +12,7 @@
     <div class="jumbotron">
       <div class="container">
         <h1 class="text-center" style="border-bottom: #000 3pt solid">Stat Tracker 3000</h1>
-        <h2 class="text-center"><?php echo $desk; ?> | <?php echo $branch; ?></h3>
+        <h2 class="text-center"><?php echo $desk; ?> | <?php echo $branch; ?> <span class="glyphicon glyphicon-cog" style="font-size: 0.7em; padding-left: 10px;" aria-hidden="true"></h3></span>
       </div>
     </div>
 
