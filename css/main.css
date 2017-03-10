@@ -24,10 +24,14 @@
 
 
 /* =================================
-    Sizes and such
+    Fonts
    ================================= */
 .stat-button h3 {
   font-size: 18px;
+}
+
+.q-type-header {
+  font-size: 28px;
 }
 
 
@@ -44,6 +48,13 @@
 /* =================================
     Responsive
    ================================= */
+
+/* Large */
+@media (min-width: 1200px) {
+  .q-type-header {
+    font-size=30px;
+  }
+}
 
 /* Medium */
 @media (min-width: 992px) {

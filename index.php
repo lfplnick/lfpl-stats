@@ -13,11 +13,22 @@
     <div class="jumbotron">
       <div class="container">
         <h1 class="text-center" style="border-bottom: #000 3pt solid">Stat Tracker 3000</h1>
-        <h2 class="text-center"><span id="desk"></span><span class="hidden-xs"> | </span><span id="branch"></span> <span id="open-settings" class="glyphicon glyphicon-cog btn" style="font-size: 0.7em; padding-left: 10px;" aria-hidden="true" onclick="changeSettings()"></span><div id="settings-buttons" class="btn-group hidden"><button type="button" id="save-settings" class="btn btn-primary btn-lg" onclick="saveSettings()">Save</button><button type="button" id="cancel-settings" class="btn btn-default btn-lg" onclick="cancelSettings()">Cancel</button></div></h2>
+        <h2 class="text-center">
+          <span id="desk"></span>
+          <span class="hidden-xs"> | </span>
+          <span id="branch"></span>
+          <span id="open-settings" class="glyphicon glyphicon-cog btn" style="font-size: 0.7em; padding-left: 10px;" aria-hidden="true" onclick="changeSettings()"></span>
+          <div id="settings-buttons" class="btn-group hidden">
+            <button type="button" id="save-settings" class="btn btn-primary btn-lg" onclick="saveSettings()">Save</button>
+            <button type="button" id="cancel-settings" class="btn btn-default btn-lg" onclick="cancelSettings()">Cancel</button>
+          </div>
+        </h2>
+<!-- Debugging screen sizes
         <h3 class="visible-xs">extra-small</h3>
         <h3 class="visible-sm">small</h3>
         <h3 class="visible-md">medium</h3>
         <h3 class="visible-lg">large</h3>
+-->
       </div>
     </div>
 
@@ -65,7 +76,7 @@
       <hr>
 
 
-      <div id="chart_div"></div>
+      <div id="chart_div" class="hidden-xs"></div>
 <?php include 'components/footer.php' ?>
     </div> <!-- /Main container -->        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
         <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.11.2.min.js"><\/script>')</script>
