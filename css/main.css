@@ -14,24 +14,16 @@
 }
 
 .q-type-header {
-  text-align: right;
-  vertical-align: middle;
-  display: table-cell;
+  text-align: center;
 }
 
-.q-type-container {
-  height: 144px;
-  display: table;
-}
 
 
 /* =================================
     Sizes and such
    ================================= */
-.stat-button {
-  height: 144px;
-  padding-top: 20px;
-  width: 33%;
+.stat-button h3 {
+  font-size: 18px;
 }
 
 
@@ -45,5 +37,29 @@
 
 
 
+/* =================================
+    Responsive
+   ================================= */
+@media (min-width: 992px) {
+  .stat-button {
+    height: 144px;
+    padding-top: 20px;
+  }
 
+  .q-type-header {
+    text-align: right;
+    vertical-align: middle;
+    display: table-cell;
+  }
 
+  .q-type-container {
+    height: 144px;
+    display: table;
+  }
+}
+
+@media (min-width: 768px) {
+  .stat-button h3 {
+    font-size: 24px;
+  }
+}
