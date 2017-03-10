@@ -17,38 +17,41 @@
       </div>
     </div>
 
-    <div class="container" style="padding-bottom: 10px;">
-      <!-- Example row of columns -->
-      <div class="row">
-        <div class="col-md-3">
-          <h1>Info</h1>
-        </div>
-        <div class="col-md-3 btn btn-default">
-          <h3>Easy<br/>( &lt; 2 minutes )</h3>
-       </div>
-        <div class="col-md-3 btn btn-default">
-          <h3>Medium<br/>( 2 - 10 minutes )</h3>
-       </div>
-        <div class="col-md-3 btn btn-default">
-          <h3>Hard<br/>( &gt;10 minutes )</h3>
-       </div>
-      </div>
-    </div>
-
     <div class="container">
-      <div class="row">
-        <div class="col-md-3">
-          <h1>Directional</h1>
+      <div class="row" style="padding-bottom: 10px;">
+        <div class="col-md-2 q-type-container">
+          <h2 class="q-type-header">Info</h2>
         </div>
-        <div class="col-md-3 btn btn-default">
-          <h3>Easy<br/>( &lt; 2 minutes )</h3>
-       </div>
-        <div class="col-md-3 btn btn-default">
-          <h3>Medium<br/>( 2 - 10 minutes )</h3>
-       </div>
-        <div class="col-md-3 btn btn-default">
-          <h3>Hard<br/>( &gt;10 minutes )</h3>
-       </div>
+
+        <div class="col-md-10">
+          <div class="btn btn-default stat-button">
+            <h3>Easy<br/>( &lt; 2 minutes )</h3>
+          </div>
+          <div class="btn btn-default stat-button">
+            <h3>Medium<br/>( 2 - 10 minutes )</h3>
+          </div>
+          <div class="btn btn-default stat-button">
+            <h3>Hard<br/>( &gt; 10 minutes )</h3>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-2 q-type-container">
+          <h2 class="q-type-header">Directional</h2>
+        </div>
+
+        <div class="col-md-10">
+          <div class="btn btn-default stat-button">
+            <h3>Easy<br/>( &lt; 2 minutes )</h3>
+          </div>
+          <div class="btn btn-default stat-button">
+            <h3>Medium<br/>( 2 - 10 minutes )</h3>
+          </div>
+          <div class="btn btn-default stat-button">
+            <h3>Hard<br/>( &gt; 10 minutes )</h3>
+          </div>
+        </div>
       </div>
 
 

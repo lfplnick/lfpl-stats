@@ -13,13 +13,25 @@
   padding-top: 0;
 }
 
+.q-type-header {
+  text-align: right;
+  vertical-align: middle;
+  display: table-cell;
+}
+
+.q-type-container {
+  height: 144px;
+  display: table;
+}
+
 
 /* =================================
     Sizes and such
    ================================= */
 .stat-button {
   height: 144px;
-  width: 144px;
+  padding-top: 20px;
+  width: 33%;
 }
 
 
