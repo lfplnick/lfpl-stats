@@ -17,6 +17,10 @@
   text-align: center;
 }
 
+#desk, #branch {
+  display: block;
+}
+
 
 
 /* =================================
@@ -40,6 +44,8 @@
 /* =================================
     Responsive
    ================================= */
+
+/* Medium */
 @media (min-width: 992px) {
   .stat-button {
     height: 144px;
@@ -58,8 +64,13 @@
   }
 }
 
+/* Small */
 @media (min-width: 768px) {
   .stat-button h3 {
     font-size: 24px;
+  }
+
+  #desk, #branch {
+    display: inline;
   }
 }

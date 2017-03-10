@@ -13,7 +13,7 @@
     <div class="jumbotron">
       <div class="container">
         <h1 class="text-center" style="border-bottom: #000 3pt solid">Stat Tracker 3000</h1>
-        <h2 class="text-center"><?php echo $desk; ?> | <?php echo $branch; ?> <span id="open-settings" class="glyphicon glyphicon-cog btn" style="font-size: 0.7em; padding-left: 10px;" aria-hidden="true" onclick="toggleSettings()"></span><div id="settings-buttons" class="btn-group hidden"><button type="button" id="save-settings" class="btn btn-primary" onclick="saveSettings()">Save</button><button type="button" id="cancel-settings" class="btn btn-default" onclick="cancelSettings()">Cancel</button></div></h2>
+        <h2 class="text-center"><span id="desk"></span><span class="hidden-xs"> | </span><span id="branch"></span> <span id="open-settings" class="glyphicon glyphicon-cog btn" style="font-size: 0.7em; padding-left: 10px;" aria-hidden="true" onclick="changeSettings()"></span><div id="settings-buttons" class="btn-group hidden"><button type="button" id="save-settings" class="btn btn-primary btn-lg" onclick="saveSettings()">Save</button><button type="button" id="cancel-settings" class="btn btn-default btn-lg" onclick="cancelSettings()">Cancel</button></div></h2>
         <h3 class="visible-xs">extra-small</h3>
         <h3 class="visible-sm">small</h3>
         <h3 class="visible-md">medium</h3>
@@ -71,7 +71,7 @@
         <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.11.2.min.js"><\/script>')</script>
 
         <script src="js/vendor/bootstrap.min.js"></script>
-
+        <script src="js/vendor/js.cookie.js"></script>
         <script src="js/main.js"></script>
         <script type="text/javascript">
           google.charts.load('current', {packages: ['corechart', 'bar']});
