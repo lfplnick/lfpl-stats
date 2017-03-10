@@ -1,3 +1,3 @@
       <footer>
-        <p>&copy; Company 2015</p>
+        <p>&copy; Louisville Free Public Library 2017</p>
       </footer>
