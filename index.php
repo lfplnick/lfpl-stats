@@ -13,7 +13,7 @@
     <div class="jumbotron">
       <div class="container">
         <h1 class="text-center" style="border-bottom: #000 3pt solid">Stat Tracker 3000</h1>
-        <h2 class="text-center"><?php echo $desk; ?> | <?php echo $branch; ?> <span class="glyphicon glyphicon-cog" style="font-size: 0.7em; padding-left: 10px;" aria-hidden="true"></h3></span>
+        <h2 class="text-center"><?php echo $desk; ?> | <?php echo $branch; ?> <span id="open-settings" class="glyphicon glyphicon-cog btn" style="font-size: 0.7em; padding-left: 10px;" aria-hidden="true" onclick="toggleSettings()"></span><div id="settings-buttons" class="btn-group hidden"><button type="button" id="save-settings" class="btn btn-primary" onclick="saveSettings()">Save</button><button type="button" id="cancel-settings" class="btn btn-default" onclick="cancelSettings()">Cancel</button></div></h2>
         <h3 class="visible-xs">extra-small</h3>
         <h3 class="visible-sm">small</h3>
         <h3 class="visible-md">medium</h3>
@@ -29,14 +29,13 @@
           <h2 class="q-type-header">Info</h2>
         </div>
 
-
-        <div class="col-xs-4 col-md-3 btn btn-default stat-button">
+        <div class="col-xs-4 col-md-3 btn btn-default stat-button" onclick="logStatistic('info', 'easy')">
           <h3>Easy<span class="hidden-xs"><br/>( &lt; 2 minutes )</span></h3>
         </div>
-        <div class="col-xs-4 col-md-3 btn btn-default stat-button">
+        <div class="col-xs-4 col-md-3 btn btn-default stat-button" onclick="logStatistic('info', 'medium')">
           <h3>Medium<span class="hidden-xs"><br/>( 2 - 10 minutes )</span></h3>
         </div>
-        <div class="col-xs-4 col-md-3 btn btn-default stat-button">
+        <div class="col-xs-4 col-md-3 btn btn-default stat-button" onclick="logStatistic('info', 'hard')">
           <h3>Hard<span class="hidden-xs"><br/>( &gt; 10 minutes )</span></h3>
         </div>
 
@@ -44,25 +43,27 @@
 
 
 
+      <div class="row" style="padding-bottom: 10px;">
 
-      <div class="row">
-        <div class="col-md-2 q-type-container">
+        <div class="col-xs-12 col-md-2 q-type-container">
           <h2 class="q-type-header">Directional</h2>
         </div>
 
-        <div class="btn btn-default stat-button">
-          <h3>Easy<br/>( &lt; 2 minutes )</h3>
+        <div class="col-xs-4 col-md-3 btn btn-default stat-button" onclick="logStatistic('directional', 'easy')">
+          <h3>Easy<span class="hidden-xs"><br/>( &lt; 2 minutes )</span></h3>
         </div>
-        <div class="btn btn-default stat-button">
-          <h3>Medium<br/>( 2 - 10 minutes )</h3>
+        <div class="col-xs-4 col-md-3 btn btn-default stat-button" onclick="logStatistic('directional', 'medium')">
+          <h3>Medium<span class="hidden-xs"><br/>( 2 - 10 minutes )</span></h3>
         </div>
-        <div class="btn btn-default stat-button">
-          <h3>Hard<br/>( &gt; 10 minutes )</h3>
+        <div class="col-xs-4 col-md-3 btn btn-default stat-button" onclick="logStatistic('directional', 'hard')">
+          <h3>Hard<span class="hidden-xs"><br/>( &gt; 10 minutes )</span></h3>
         </div>
+
       </div>
 
 
       <hr>
+
 
       <div id="chart_div"></div>
 <?php include 'components/footer.php' ?>
