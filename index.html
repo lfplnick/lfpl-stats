@@ -6,17 +6,30 @@
     <body>
         <h1>Welcome to LFPL Stats Homepage!</h1>
 
-        <form action="includes/InitializeDatabases.php" method="post">
-            <label for="in-username">Username:</label>
-            <input type="text" id="in-username" name="user">
-            
-            <label for="in-password">Password:</label>
-            <input type="password" id="in-password" name="pw">
+        <form action="includes/InitializeDatabase.php" method="post">
+
+            <label for="in-admin-username">Administrative Username:</label>
+            <input type="text" id="in-admin-username" name="admin-user" value="root">
+            </br>
+
+            <label for="in-admin-password">Administrative Password:</label>
+            <input type="password" id="in-admin-password" name="admin-pw">
+            </br>
+
+            <label for="in-stats-username">Web Access Username:</label>
+            <input type="text" id="in-stats-username" name="stats-user" value="StatsUser">
+            </br>
+
+            <label for="in-stats-password">Web Access Password:</label>
+            <input type="password" id="in-stats-password" name="stats-pw">
+            </br>
 
             <label for="in-database">Database name:</label>
             <input type="text" id="in-database" name="db" value="lfpl_stats">
+            </br>
 
             <button type="submit">Initizlize Databases</button>
+
         </form>
     </body>
 </html>
