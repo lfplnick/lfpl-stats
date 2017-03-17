@@ -39,6 +39,65 @@ class InitializeDatabase {
     private $statsPassword;
 
 
+
+    public function __construct( $dbName, $adminUsername = null, $adminPassword = null ) {
+        $this->setDbName( $dbName );
+
+        if ( isset($adminUsername) ) {
+            $this->adminUsername = $adminUsername;
+        }
+
+        if ( !isset($adminPassword) ) {
+            $this->adminPassword = $adminPassword;
+        }
+    }
+
+
+
+    /**
+     * Getters and setters. Note that we do NOT supply a method for getting
+     * admin or stats usernames and passwords. Just seems like a bad idea.
+     */
+    public function setDbName( $dbName ) {
+        $this->dbName = $dbName;
+    }
+
+    public function getDbName() {
+        return $this->dbName;
+    }
+
+    public function setAdminUsername( $username ) {
+        $this->adminUsername = $username;
+    }
+
+    public function adminUsernameIsSet() {
+        return isset( $this->adminUsername );
+    }
+
+    public function setAdminPassword( $password ) {
+        $this->adminPassword = $password;
+    }
+
+    public function adminPasswordIsSet() {
+        return isset( $this->adminPassword );
+    }
+
+    public function setStatsUsername( $username ) {
+        $this->statsUsername = $username;
+    }
+
+    public function statsUsernameIsSet() {
+        return isset( $this->statsUsername );
+    }
+
+    public function setStatsPassword( $password ) {
+        $this->statsPassword = $password;
+    }
+
+    public function statsPasswordIsSet() {
+        return isset( $this->statsPassword );
+    }
+
     /**
      * Connect to database on localhost specified by dbName.
      *
@@ -47,7 +106,7 @@ class InitializeDatabase {
      */
     private function connectToDatabase( $dbName = '' ) {
         $connectionString = 'mysql:host=localhost';
-        if ( $dbName !== '' ) ) {
+        if ( $dbName !== '' ) {
             $connectionString .= ";dbName={$dbName}";
         }
 
@@ -69,7 +128,7 @@ class InitializeDatabase {
         $sql = str_replace(':db_name', $this->dbName, $sql);
 
         $result = $conn->exec($sql);
-        return $result
+        return $result;
     }
 
    /**
@@ -98,7 +157,7 @@ class InitializeDatabase {
 
 
 
-
+/*
 if (!isset($_POST["admin-user"])) {
     http_response_code(403);
     echo("Must supply username");
@@ -159,4 +218,4 @@ $conn = null;
 
 
 
-
+*/
