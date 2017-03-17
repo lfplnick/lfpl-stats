@@ -40,14 +40,12 @@ class InitializeDatabase {
 
 
 
-    public function __construct( $dbName, $adminUsername = null, $adminPassword = null ) {
-        $this->setDbName( $dbName );
-
+    public function __construct( $adminUsername = null, $adminPassword = null ) {
         if ( isset($adminUsername) ) {
             $this->adminUsername = $adminUsername;
         }
 
-        if ( !isset($adminPassword) ) {
+        if ( isset($adminPassword) ) {
             $this->adminPassword = $adminPassword;
         }
     }
@@ -104,10 +102,10 @@ class InitializeDatabase {
      * @param string $dbName Name of database to connect to.
      * @return bool Returns true if connection is successful.
      */
-    private function connectToDatabase( $dbName = '' ) {
+    private function connectToDatabase() {
         $connectionString = 'mysql:host=localhost';
-        if ( $dbName !== '' ) {
-            $connectionString .= ";dbName={$dbName}";
+        if ( isset( $this->dbName ) ) {
+            $connectionString .= ";dbName={$this->dbName}";
         }
 
         $this->conn = new PDO( $connectionString, $this->adminUsername, $this->adminPassword );
@@ -117,18 +115,19 @@ class InitializeDatabase {
     }
 
     /**
-     * Actually creates the database
+     * Actually creates the database. This is not injection safe.
      *
      * @return bool Returns true if database is created successfully.
      */
-    public function createDatabase() {
+    public function createDatabase( $dbName ) {
         $this->connectToDatabase();
 
-        $sql = file_get_contents("tables.sql");
-        $sql = str_replace(':db_name', $this->dbName, $sql);
+        $sql = file_get_contents("includes/tables.sql");
+        $sql = str_replace(':db_name', $dbName, $sql);
 
-        $result = $conn->exec($sql);
-        return $result;
+        $result = $this->conn->exec($sql);
+
+        return ( $result === 1 ? true : false );
     }
 
    /**
