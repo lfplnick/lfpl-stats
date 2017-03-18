@@ -194,13 +194,16 @@ class InitializeDatabase {
      * Seeds several tables in the database with relevant LFPL data.
      *
      * This function should not be called until dbName is set.
+     * @todo We're currently running on faith that this is done. We should
+     *  only return true if everything actually happens successfully.
      */
     public function seedDB() {
         $this->connectToDatabase();
 
         $seedSql = file_get_contents('includes/seed.sql');
         $seedResult = $this->conn->exec( $seedSql );
-        var_dump($seedResult);
+
+        return true;
     }
 }
 
