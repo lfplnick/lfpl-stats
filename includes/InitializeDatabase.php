@@ -4,6 +4,7 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 # Todo - We need to check if MySQL driver is installed during install process.
+# Todo - We should be able to initialize with a user that already exists.
 
 
 class InitializeDatabase {
@@ -12,6 +13,11 @@ class InitializeDatabase {
      * @var string $dbName Name of database to be initialized
      */
     private $dbName;
+
+    /**
+     * @var string $host Hostname or IP of MySQL server
+     */
+    private $host = 'localhost';
 
     /**
      * @var PDO $conn Connection to database
@@ -64,6 +70,14 @@ class InitializeDatabase {
         return $this->dbName;
     }
 
+    public function setHost( $host ) {
+        $this->host = $host;
+    }
+
+    public function getHost() {
+        return $this->dbName;
+    }
+
     public function setAdminUsername( $username ) {
         $this->adminUsername = $username;
     }
@@ -103,7 +117,7 @@ class InitializeDatabase {
      * @return bool Returns true if connection is successful.
      */
     private function connectToDatabase() {
-        $connectionString = 'mysql:host=localhost';
+        $connectionString = "mysql:host={$this->host}";
         if ( isset( $this->dbName ) ) {
             $connectionString .= ";dbname={$this->dbName}";
         }
