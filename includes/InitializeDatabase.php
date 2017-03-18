@@ -189,6 +189,19 @@ class InitializeDatabase {
 
         return $createSuccess && $grantSuccess;
     }
+
+    /**
+     * Seeds several tables in the database with relevant LFPL data.
+     *
+     * This function should not be called until dbName is set.
+     */
+    public function seedDB() {
+        $this->connectToDatabase();
+
+        $seedSql = file_get_contents('includes/seed.sql');
+        $seedResult = $this->conn->exec( $seedSql );
+        var_dump($seedResult);
+    }
 }
 
 
