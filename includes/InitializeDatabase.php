@@ -20,6 +20,11 @@ class InitializeDatabase {
     private $host = 'localhost';
 
     /**
+     * @var string $port Port used by host for MySQL
+     */
+    private $port;
+
+    /**
      * @var PDO $conn Connection to database
      */
     private $conn;
@@ -75,7 +80,15 @@ class InitializeDatabase {
     }
 
     public function getHost() {
-        return $this->dbName;
+        return $this->host;
+    }
+
+    public function setPort( $port ) {
+        $this->port = $port;
+    }
+
+    public function getPort() {
+        return $this->port;
     }
 
     public function setAdminUsername( $username ) {
@@ -118,6 +131,11 @@ class InitializeDatabase {
      */
     private function connectToDatabase() {
         $connectionString = "mysql:host={$this->host}";
+
+        if ( isset( $this->port ) ) {
+            $connectionString .= ";port={$this->port}";
+        }
+
         if ( isset( $this->dbName ) ) {
             $connectionString .= ";dbname={$this->dbName}";
         }
