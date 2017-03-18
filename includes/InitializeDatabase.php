@@ -105,11 +105,17 @@ class InitializeDatabase {
     private function connectToDatabase() {
         $connectionString = 'mysql:host=localhost';
         if ( isset( $this->dbName ) ) {
-            $connectionString .= ";dbName={$this->dbName}";
+            $connectionString .= ";dbname={$this->dbName}";
         }
 
-        $this->conn = new PDO( $connectionString, $this->adminUsername, $this->adminPassword );
-        $this->conn->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+
+        try {
+            $this->conn = new PDO( $connectionString, $this->adminUsername, $this->adminPassword );
+            $this->conn->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+        } catch ( PDOException $e ) {
+            // @todo Handle this better.
+            return false;
+        }
 
         return true;
     }
@@ -127,7 +133,7 @@ class InitializeDatabase {
 
         $result = $this->conn->exec($sql);
 
-        return ( $result === 1 ? true : false );
+        return ( $result === 1 );
     }
 
    /**
@@ -136,15 +142,15 @@ class InitializeDatabase {
     * @return bool Returns true if user is created successfully and granted
     *  correct permissions.
     */
-   public function createUser() {
-        $this->connectToDatabase($this->dbName);
+   public function createStatsUser() {
+        $this->connectToDatabase();
 
         $createSql = "CREATE USER '{$this->statsUsername}'@'%' IDENTIFIED BY '{$this->statsPassword}';";
         $createResult = $this->conn->exec( $createSql );
         $createSuccess = ( $createResult === 0 );
 
         if ( $createSuccess ) {
-            $grantSql = "GRANT ALL PRIVILEGES ON * TO '{$this->user}'@'%';";
+            $grantSql = "GRANT ALL PRIVILEGES ON * TO '{$this->statsUsername}'@'%';";
             $grantResult = $this->conn->exec( $grantSql );
             $grantSuccess = ( $grantResult === 0 );
         }
