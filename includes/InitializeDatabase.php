@@ -4,6 +4,7 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 # Todo - We need to check if MySQL driver is installed during install process.
+# Todo - We should be able to initialize with a user that already exists.
 
 
 class InitializeDatabase {
@@ -12,6 +13,16 @@ class InitializeDatabase {
      * @var string $dbName Name of database to be initialized
      */
     private $dbName;
+
+    /**
+     * @var string $host Hostname or IP of MySQL server
+     */
+    private $host = 'localhost';
+
+    /**
+     * @var string $port Port used by host for MySQL
+     */
+    private $port;
 
     /**
      * @var PDO $conn Connection to database
@@ -39,37 +50,122 @@ class InitializeDatabase {
     private $statsPassword;
 
 
+
+    public function __construct( $adminUsername = null, $adminPassword = null ) {
+        if ( isset($adminUsername) ) {
+            $this->adminUsername = $adminUsername;
+        }
+
+        if ( isset($adminPassword) ) {
+            $this->adminPassword = $adminPassword;
+        }
+    }
+
+
+
+    /**
+     * Getters and setters. Note that we do NOT supply a method for getting
+     * admin or stats usernames and passwords. Just seems like a bad idea.
+     */
+    public function setDbName( $dbName ) {
+        $this->dbName = $dbName;
+    }
+
+    public function getDbName() {
+        return $this->dbName;
+    }
+
+    public function setHost( $host ) {
+        $this->host = $host;
+    }
+
+    public function getHost() {
+        return $this->host;
+    }
+
+    public function setPort( $port ) {
+        $this->port = $port;
+    }
+
+    public function getPort() {
+        return $this->port;
+    }
+
+    public function setAdminUsername( $username ) {
+        $this->adminUsername = $username;
+    }
+
+    public function adminUsernameIsSet() {
+        return isset( $this->adminUsername );
+    }
+
+    public function setAdminPassword( $password ) {
+        $this->adminPassword = $password;
+    }
+
+    public function adminPasswordIsSet() {
+        return isset( $this->adminPassword );
+    }
+
+    public function setStatsUsername( $username ) {
+        $this->statsUsername = $username;
+    }
+
+    public function statsUsernameIsSet() {
+        return isset( $this->statsUsername );
+    }
+
+    public function setStatsPassword( $password ) {
+        $this->statsPassword = $password;
+    }
+
+    public function statsPasswordIsSet() {
+        return isset( $this->statsPassword );
+    }
+
     /**
      * Connect to database on localhost specified by dbName.
      *
      * @param string $dbName Name of database to connect to.
      * @return bool Returns true if connection is successful.
      */
-    private function connectToDatabase( $dbName = '' ) {
-        $connectionString = 'mysql:host=localhost';
-        if ( $dbName !== '' ) ) {
-            $connectionString .= ";dbName={$dbName}";
+    private function connectToDatabase() {
+        $connectionString = "mysql:host={$this->host}";
+
+        if ( isset( $this->port ) ) {
+            $connectionString .= ";port={$this->port}";
         }
 
-        $this->conn = new PDO( $connectionString, $this->adminUsername, $this->adminPassword );
-        $this->conn->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+        if ( isset( $this->dbName ) ) {
+            $connectionString .= ";dbname={$this->dbName}";
+        }
+
+
+        try {
+            $this->conn = new PDO( $connectionString, $this->adminUsername, $this->adminPassword );
+            $this->conn->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+        } catch ( PDOException $e ) {
+            // @todo Handle this better.
+            return false;
+        }
 
         return true;
     }
 
     /**
-     * Actually creates the database
+     * Actually creates the database. This is not injection safe.
      *
      * @return bool Returns true if database is created successfully.
      */
-    public function createDatabase() {
+    public function createDatabase( $dbName ) {
         $this->connectToDatabase();
 
-        $sql = file_get_contents("tables.sql");
-        $sql = str_replace(':db_name', $this->dbName, $sql);
+        $sql = file_get_contents("includes/tables.sql");
+        $sql = str_replace(':db_name', $dbName, $sql);
 
-        $result = $conn->exec($sql);
-        return $result
+        $result = $this->conn->exec($sql);
+
+        return ( $result === 1 );
     }
 
    /**
@@ -78,27 +174,40 @@ class InitializeDatabase {
     * @return bool Returns true if user is created successfully and granted
     *  correct permissions.
     */
-   public function createUser() {
-        $this->connectToDatabase($this->dbName);
+   public function createStatsUser() {
+        $this->connectToDatabase();
 
         $createSql = "CREATE USER '{$this->statsUsername}'@'%' IDENTIFIED BY '{$this->statsPassword}';";
         $createResult = $this->conn->exec( $createSql );
         $createSuccess = ( $createResult === 0 );
 
         if ( $createSuccess ) {
-            $grantSql = "GRANT ALL PRIVILEGES ON * TO '{$this->user}'@'%';";
+            $grantSql = "GRANT ALL PRIVILEGES ON * TO '{$this->statsUsername}'@'%';";
             $grantResult = $this->conn->exec( $grantSql );
             $grantSuccess = ( $grantResult === 0 );
         }
 
         return $createSuccess && $grantSuccess;
     }
+
+    /**
+     * Seeds several tables in the database with relevant LFPL data.
+     *
+     * This function should not be called until dbName is set.
+     */
+    public function seedDB() {
+        $this->connectToDatabase();
+
+        $seedSql = file_get_contents('includes/seed.sql');
+        $seedResult = $this->conn->exec( $seedSql );
+        var_dump($seedResult);
+    }
 }
 
 
 
 
-
+/*
 if (!isset($_POST["admin-user"])) {
     http_response_code(403);
     echo("Must supply username");
@@ -159,4 +268,4 @@ $conn = null;
 
 
 
-
+*/
