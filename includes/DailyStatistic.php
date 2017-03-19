@@ -30,4 +30,39 @@ class DailyStatistic {
      *  service point hasn't changed since stat application was loaded.
      */
     private $servicePointName;
+
+
+    public function __construct( array $args ) {
+        foreach( $args as $key => $value  ){
+            switch ( strtolower( $key ) ) {
+                case 'branchname':
+                    $this->setBranchName( $value );
+                    break;
+
+                case 'stattypeid':
+                    $this->setStatTypeId( $value );
+                    break;
+
+                case 'servicepointid':
+                    $this->setServicePointId( $value );
+                    break;
+
+                case 'servicepointname':
+                    $this->setServicePointName( $value );
+                    break;
+            }
+        }
+    }
+
+
+    public function getStatTypeId(){ return $this->statTypeId; }
+    public function getServicePointId(){ return $this->servicePointId; }
+    public function getBranchName(){ return $this->branchName; }
+    public function getServicePointName(){ return $this->servicePointName; }
+
+    public function setStatTypeId( $statTypeId ){ $this->statTypeId = $statTypeId; }
+    public function setServicePointId( $servicePointId ){ $this->servicePointId = $servicePointId; }
+    public function setBranchName( $branchName ){ $this->branchName = $branchName; }
+    public function setServicePointName($servicePointName ){ $this->servicePointName = $servicePointName; }
+
 }
