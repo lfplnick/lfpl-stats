@@ -7,6 +7,8 @@
  * the database.
  */
 
+require_once 'LocalSettings.php';
+
 class DailyStatistic {
     /**
      * @var int $statTypeId ID of statistic type pulled from stat_types table.
@@ -65,4 +67,36 @@ class DailyStatistic {
     public function setBranchName( $branchName ){ $this->branchName = $branchName; }
     public function setServicePointName($servicePointName ){ $this->servicePointName = $servicePointName; }
 
+
+    /**
+     * Record statistic to the daily_stats table.
+     */
+    public function record() {
+        global $sgDbName, $sgDbHost, $sgDbPort, $sg_mysql_statsName, $sg_mysql_statsPw;
+        $connectionString = "mysql:host={$sgDbHost};port={$sgDbPort};dbname={$sgDbName}";
+
+        try {
+            $conn = new PDO( $connectionString, $sg_mysql_statsName, $sg_mysql_statsPw );
+            $conn->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+        } catch ( PDOException $e ) {
+            // @todo Handle this better.
+            return false;
+        }
+
+        $sql = "INSERT INTO stat_daily_stats ( dst_id, sp_id ) VALUES ( :dstId, :spId )";
+        $statement = $conn->prepare($sql);
+
+        $goForExecute = true;
+
+        $goForExecute = $goForExecute && $statement->bindParam( ':dstId', $this->statTypeId, PDO::PARAM_INT );
+        $goForExecute = $goForExecute && $statement->bindParam( ':spId', $this->servicePointId, PDO::PARAM_INT );
+
+        if ( $goForExecute ) {
+            $result = $statement->execute();
+        } else {
+            return false;
+        }
+
+        return $result;
+    }
 }
