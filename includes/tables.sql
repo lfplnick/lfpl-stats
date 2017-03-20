@@ -41,8 +41,46 @@ CREATE TABLE stat_desks(
     --
     -- Desk type
     desks_type varchar(255) NOT NULL
-);
 
+)ENGINE=InnoDB;
+
+
+--
+-- Service point history
+--
+-- Historic table of service points. Any change to the service point table
+-- should be preceeded by a change to this table. The daily stats table links
+-- to this table so that it stays resistant to change when service points are
+-- updated.
+--
+-- Entries in this table cannot be deleted if they are referenced in the
+-- stat_daily_stats table.
+CREATE TABLE stat_historic_service_points(
+
+    --
+    -- Historic service point ID
+    --
+    -- This is referenced in the stat_daily_stats table.
+    hsp_id int unsigned NOT NULL PRIMARY KEY AUTO_INCREMENT,
+
+    --
+    -- Branch name
+    --
+    -- Branch name of the service point at time of creating/update.
+    branches_name varchar(255) NOT NULL,
+
+    --
+    -- Service point name
+    --
+    -- Name of the service point at its time of creation/update.
+    sp_name varchar(255) NOT NULL,
+
+    --
+    -- Desk type
+    --
+    -- Service point desk type at time of creation/update.
+    desks_type varchar(255) NOT NULL
+)ENGINE=InnoDB;
 
 --
 -- Service points
@@ -70,9 +108,90 @@ CREATE TABLE stat_service_points(
     --
     -- Desk type ID
     --
-    -- Foreign key to the stat_desks.desks_id.
-    desks_id int unsigned NOT NULL
-);
+    -- Foreign key to the stat_desks.desks_id. This should only ever be NULL if
+    -- the desk type is deleted.
+    desks_id int unsigned,
+
+    --
+    -- Historic service point ID
+    --
+    -- This tells which entry in the stat_historic_service_points table
+    -- corresponds to this particular service point instance. Whenever a service
+    -- point is created or updated a new entry should first be created in the
+    -- historic service point table for this field to reference.
+    hsp_id int unsigned NOT NULL,
+
+    --
+    -- Link to branch. If a branch is deleted then all of its service points are
+    -- also removed.
+    FOREIGN KEY fk_branch(branches_id)
+     REFERENCES stat_branches(branches_id)
+     ON DELETE CASCADE
+     ON UPDATE CASCADE,
+
+    --
+    -- Link to desk type. If a desk type is removed then the service point type
+    -- is set to NULL so that it can be reassigned a new desk type. Note that
+    -- until the service point is updated it will still point to the old
+    -- historic service point thereby using the old desk type.
+    FOREIGN KEY fk_desks(desks_id)
+     REFERENCES stat_desks(desks_id)
+     ON DELETE SET NULL
+     ON UPDATE CASCADE,
+
+    --
+    -- Link to historic service point. Historic service points should not be
+    -- deleted unless the following two conditions are met:
+    --  1) There is no active service point referencing the historic sp
+    --  2) There are no daily stats that refer to the historic sp
+    --
+    -- Whenever a service point is updated these two conditions should be
+    -- checked for the former historic service point and it should be removed
+    -- if there are no references to it.
+    FOREIGN KEY fk_hsp(hsp_id)
+     REFERENCES stat_historic_service_points(hsp_id)
+
+)ENGINE=InnoDB;
+
+
+--
+-- Question types
+--
+-- These entries represent the types of questions that patrons ask. Or, rather,
+-- the type of questions that the library wants to track.
+--
+-- Stat types are tied to the daily stats table. If there are any records in the
+-- stat_daily_stats table that refer to a type in this table then the type is
+-- locked and cannot be deleted. It should also not be updated, but that needs
+-- to be enforced in-app.
+--
+-- If the type needs to be retired at that point then the dst_enabled flag
+-- should be set to 0. If a type needs to updated then a new entry should be
+-- created and the old one retired.
+CREATE TABLE stat_daily_stat_types(
+
+    --
+    -- Question type ID (or "Daily Stat Type ID" if you prefer)
+    dst_id int unsigned NOT NULL PRIMARY KEY AUTO_INCREMENT,
+
+    --
+    -- Name of question type. Examples include  "Directional", "Informational",
+    -- or possibly "Way Too Personal".
+    dst_name varchar(255) NOT NULL,
+
+    --
+    -- Optional description of question type. This is just in case the first 255
+    -- characters don't do the question type justice.
+    dst_desc varchar(255),
+
+    --
+    -- Type enabled
+    --
+    -- Tells whether or not the type is currently in use. If set to 0 (false)
+    -- then any statistic that tries to record using the type should fail.
+    dst_enabled boolean NOT NULL DEFAULT 1
+
+)ENGINE=InnoDB;
 
 
 --
@@ -103,35 +222,29 @@ CREATE TABLE stat_daily_stats(
     dst_id int unsigned NOT NULL,
 
     --
-    -- Service point ID
+    -- Historic service point ID
     --
-    -- Foreign key to stat_service_points.sp_id. Tells where the question was
-    -- answered.
-    sp_id int unsigned NOT NULL
-);
-
-
---
--- Question types
---
--- These entries represent the types of questions that patrons ask. Or, rather,
--- the type of questions that the library wants to track.
-CREATE TABLE stat_daily_stat_types(
+    -- This tells which entry in the historic service point table holds service
+    -- point information for this daily stat record. Historic service point
+    -- records should not be deleted unless there are no daily stats linked to
+    -- them.
+    hsp_id int unsigned NOT NULL,
 
     --
-    -- Question type ID (or "Daily Stat Type ID" if you prefer)
-    dst_id int unsigned NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    -- Link to question type. Question types (or daily statistic type) should
+    -- not be deleted unless there are no records in this daily stats table that
+    -- refer to them.
+    FOREIGN KEY fk_dst(dst_id)
+     REFERENCES stat_daily_stat_types(dst_id),
 
     --
-    -- Name of question type. Examples include  "Directional", "Informational",
-    -- or possibly "Way Too Personal".
-    dst_name varchar(255) NOT NULL,
+    -- Link to historic service point. Historic service points should not be
+    -- deleted unless there are no records in this daily stats table that refer
+    -- to them.
+    FOREIGN KEY fk_hsp(hsp_id)
+     REFERENCES stat_historic_service_points(hsp_id)
 
-    --
-    -- Optional description of question type. This is just in case the first 255
-    -- characters don't do the question type justice.
-    dst_desc varchar(255)
-);
+)ENGINE=InnoDB;
 
 
 --
@@ -155,7 +268,8 @@ CREATE TABLE stat_outreach_primary_type(
     -- This is included so that outreach types can be retired without removing
     -- them from the database. If this is set to 0 (false) then secondary types
     -- that refer to the primary type should also be hidden from staff.
-    opt_enabled boolean NOT NULL
+    opt_enabled boolean NOT NULL DEFAULT 1
+
 )ENGINE=InnoDB;
 
 
@@ -188,7 +302,7 @@ CREATE TABLE stat_outreach_secondary_type(
     --
     -- This is the same idea as with the primary type. The type should be
     -- disabled rather than deleted so that historic data remains intact.
-    ost_enabled boolean NOT NULL,
+    ost_enabled boolean NOT NULL DEFAULT 1,
 
     --
     -- Link to branch.
@@ -196,6 +310,7 @@ CREATE TABLE stat_outreach_secondary_type(
      REFERENCES stat_outreach_primary_type(opt_id)
      ON DELETE CASCADE
      ON UPDATE CASCADE
+
 )ENGINE=InnoDB;
 
 
@@ -279,4 +394,5 @@ CREATE TABLE stat_outreach_stats(
      REFERENCES stat_outreach_secondary_type(ost_id)
      ON DELETE SET NULL
      ON UPDATE CASCADE
+
 )ENGINE=InnoDB;
