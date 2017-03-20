@@ -11,7 +11,7 @@ CREATE TABLE stat_branches(
 
     --
     -- Branch ID
-    branches_id int unsigned NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    branches_id smallint unsigned NOT NULL PRIMARY KEY AUTO_INCREMENT,
 
     --
     -- Branch name
@@ -23,6 +23,7 @@ CREATE TABLE stat_branches(
     -- Most branches have a digit abbreviation which may be easier to use for
     -- identifying a branch, or at least less ambiguous than the spelling.
     branches_abbr varchar(255)
+
 )ENGINE=InnoDB;
 
 
@@ -64,7 +65,7 @@ CREATE TABLE stat_service_points(
     -- Branch ID
     --
     -- Foreign key to the stat_branches.branches_id.
-    branches_id int unsigned NOT NULL,
+    branches_id smallint unsigned NOT NULL,
 
     --
     -- Desk type ID
@@ -213,7 +214,7 @@ CREATE TABLE stat_outreach_stats(
     --
     -- Foreign key to stat_branches.branches_id. This is the branch that had the
     -- outreach.
-    branches_id int unsigned NOT NULL,
+    branches_id smallint unsigned NOT NULL,
 
     --
     -- Primary Type ID
