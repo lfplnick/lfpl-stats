@@ -1,0 +1,5 @@
+[
+    { "id" : 1, "name" : "Circulation Desk" },
+    { "id" : 2, "name" : "Reference Desk"},
+    { "id" : 3, "name" : "Children's Desk"}
+]
