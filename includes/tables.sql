@@ -46,43 +46,6 @@ CREATE TABLE stat_desks(
 
 
 --
--- Service point history
---
--- Historic table of service points. Any change to the service point table
--- should be preceeded by a change to this table. The daily stats table links
--- to this table so that it stays resistant to change when service points are
--- updated.
---
--- Entries in this table cannot be deleted if they are referenced in the
--- stat_daily_stats table.
-CREATE TABLE stat_historic_service_points(
-
-    --
-    -- Historic service point ID
-    --
-    -- This is referenced in the stat_daily_stats table.
-    hsp_id int unsigned NOT NULL PRIMARY KEY AUTO_INCREMENT,
-
-    --
-    -- Branch name
-    --
-    -- Branch name of the service point at time of creating/update.
-    branches_name varchar(255) NOT NULL,
-
-    --
-    -- Service point name
-    --
-    -- Name of the service point at its time of creation/update.
-    sp_name varchar(255) NOT NULL,
-
-    --
-    -- Desk type
-    --
-    -- Service point desk type at time of creation/update.
-    desks_type varchar(255) NOT NULL
-)ENGINE=InnoDB;
-
---
 -- Service points
 --
 -- These are the actual service points in a particular library branch. For
@@ -113,15 +76,6 @@ CREATE TABLE stat_service_points(
     desks_id int unsigned,
 
     --
-    -- Historic service point ID
-    --
-    -- This tells which entry in the stat_historic_service_points table
-    -- corresponds to this particular service point instance. Whenever a service
-    -- point is created or updated a new entry should first be created in the
-    -- historic service point table for this field to reference.
-    hsp_id int unsigned NOT NULL,
-
-    --
     -- Link to branch. If a branch is deleted then all of its service points are
     -- also removed.
     FOREIGN KEY fk_branch(branches_id)
@@ -137,19 +91,7 @@ CREATE TABLE stat_service_points(
     FOREIGN KEY fk_desks(desks_id)
      REFERENCES stat_desks(desks_id)
      ON DELETE SET NULL
-     ON UPDATE CASCADE,
-
-    --
-    -- Link to historic service point. Historic service points should not be
-    -- deleted unless the following two conditions are met:
-    --  1) There is no active service point referencing the historic sp
-    --  2) There are no daily stats that refer to the historic sp
-    --
-    -- Whenever a service point is updated these two conditions should be
-    -- checked for the former historic service point and it should be removed
-    -- if there are no references to it.
-    FOREIGN KEY fk_hsp(hsp_id)
-     REFERENCES stat_historic_service_points(hsp_id)
+     ON UPDATE CASCADE
 
 )ENGINE=InnoDB;
 
@@ -222,13 +164,16 @@ CREATE TABLE stat_daily_stats(
     dst_id int unsigned NOT NULL,
 
     --
-    -- Historic service point ID
+    -- Service point ID
     --
-    -- This tells which entry in the historic service point table holds service
-    -- point information for this daily stat record. Historic service point
-    -- records should not be deleted unless there are no daily stats linked to
-    -- them.
-    hsp_id int unsigned NOT NULL,
+    -- This tells which entry in the service point table holds service point
+    -- information for this daily stat record. Service point records should not
+    -- be deleted or updated unless there are no daily stats linked to them.
+    --
+    -- Rather than deleting a referenced service point it should be disabled.
+    -- Rather than updating a referenced service point it a new service point
+    -- should be created and the old one disabled.
+    sp_id int unsigned NOT NULL,
 
     --
     -- Link to question type. Question types (or daily statistic type) should
@@ -238,11 +183,10 @@ CREATE TABLE stat_daily_stats(
      REFERENCES stat_daily_stat_types(dst_id),
 
     --
-    -- Link to historic service point. Historic service points should not be
-    -- deleted unless there are no records in this daily stats table that refer
-    -- to them.
-    FOREIGN KEY fk_hsp(hsp_id)
-     REFERENCES stat_historic_service_points(hsp_id)
+    -- Link to service point. Service points should not be deleted or updated
+    -- unless there are no records in this daily stats table that refer to them.
+    FOREIGN KEY fk_sp(sp_id)
+     REFERENCES stat_service_points(sp_id)
 
 )ENGINE=InnoDB;
 
