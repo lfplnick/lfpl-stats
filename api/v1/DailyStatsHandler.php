@@ -64,74 +64,8 @@ class DailyStatsHandler extends StatsHandler {
                 // set primary resource
                 $this->primaryResource = 'branch';
 
-                // next param should be branch abbreviation, stop parsing if
-                //  it isn't
-                $this->branchAbbr = $this->nextParam();
-                if( !$this->branchAbbr ){
-                    $this->requestGood = self::REQUEST_NOGOOD;
-                    break;
-                }
-
-
-                // Figure out what next parameter is. It should either be:
-                //  1) empty (i.e. false)
-                //  2) a date range (or single date)
-                //  3) 'counts'
-                $nextParam = $this->nextParam();
-
-                // 1) empty
-                if( $nextParam === false ){
-                    $this->requestGood = self::REQUEST_GOOD;
-                    break;
-                }
-
-                // 2) date range
-                elseif( $this->isDateRange( $nextParam ) ){
-                    $this->dateStart = $this->parseStartDate( $nextParam );
-                    $this->dateEnd = $this->parseEndDate( $nextParam );
-
-                    // Allowing queries for multi-day statistic details could
-                    // result in a large amount of data being transferred.
-                    if ( $this->dateStart !== $this->dateEnd ) {
-                        $this->countsOnly = true;
-                    }
-                }
-
-                // 3) 'counts'
-                elseif( strtolower( $nextParam ) === 'counts' ) {
-                    $this->countsOnly = true;
-                }
-
-                // None of the above == bad request
-                else {
-                    $this->requestGood = self::REQUEST_NOGOOD;
-                    break;
-                }
-
-
-                // Rinse and repeat. Next parameter should either be empty or
-                //  'counts'.
-                $nextParam = $this->nextParam();
-                if( $nextParam === false ){
-                    $this->requestGood = self::REQUEST_GOOD;
-                    break;
-                } elseif ( strtolower( $nextParam ) === 'counts') {
-                    $this->countsOnly = true;
-                } else {
-                    $this->requestGood = self::REQUEST_NOGOOD;
-                    break;
-                }
-
-
-                // Last check, parameter list should be empty.
-                if ( $this->nextParam() === false ) {
-                    $this->requestGood = self::REQUEST_GOOD;
-                    break;
-                }
-
-
-                // Good request would have exitited the switch by now.
-                $this->requestGood = self::REQUEST_NOGOOD;
+                if(     $this->method === 'get'){ $this->parseGetBranch(); }
+                else{ $this->requestGood = self::REQUEST_NOGOOD; }
                 break;
             // End 'branch' case
 
@@ -147,6 +81,85 @@ class DailyStatsHandler extends StatsHandler {
             // End default case
         }// End primary resource switch
     }// end getParameters()
+
+    private function parseGetBranch(){
+        // this function should only be called if method is 'get' and primary
+        // resource is 'branch'
+        if( ( $this->method !== 'get' ) || ( $this->primaryResource !== 'branch' ) ){
+            return false;
+        }
+
+        // next param should be branch abbreviation, stop parsing if it isn't
+        $this->branchAbbr = $this->nextParam();
+        if( !$this->branchAbbr ){
+            $this->requestGood = self::REQUEST_NOGOOD;
+            return;
+        }
+
+
+        // Figure out what next parameter is. It should either be:
+        //  1) empty (i.e. false)
+        //  2) a date range (or single date)
+        //  3) 'counts'
+        $nextParam = $this->nextParam();
+
+        // 1) empty
+        if( $nextParam === false ){
+            $this->requestGood = self::REQUEST_GOOD;
+            return;
+        }
+
+        // 2) date range
+        elseif( $this->isDateRange( $nextParam ) ){
+            $this->dateStart = $this->parseStartDate( $nextParam );
+            $this->dateEnd = $this->parseEndDate( $nextParam );
+
+            // Allowing queries for multi-day statistic details could result in
+            // a large amount of data being transferred.
+            if ( $this->dateStart !== $this->dateEnd ) {
+                $this->countsOnly = true;
+            }
+        }
+
+        // 3) 'counts'
+        elseif( strtolower( $nextParam ) === 'counts' ) {
+            $this->countsOnly = true;
+        }
+
+        // None of the above == bad request
+        else {
+            $this->requestGood = self::REQUEST_NOGOOD;
+            return;
+        }
+
+
+        // Rinse and repeat. Next parameter should either be empty or
+        //  'counts'.
+        $nextParam = $this->nextParam();
+        if( $nextParam === false ){
+            $this->requestGood = self::REQUEST_GOOD;
+            return;
+        } elseif ( strtolower( $nextParam ) === 'counts') {
+            $this->countsOnly = true;
+        } else {
+            $this->requestGood = self::REQUEST_NOGOOD;
+            return;
+        }
+
+
+        // Last check, parameter list should be empty.
+        if ( $this->nextParam() === false ) {
+            $this->requestGood = self::REQUEST_GOOD;
+            return;
+        }
+
+
+        // Good request would have returned by now.
+        $this->requestGood = self::REQUEST_NOGOOD;
+
+    }
+
+
 
     public static function isDateRange( $test ){
         $regex = '/(\d{8})(?:\-(\d{8}))?/';
@@ -233,12 +246,6 @@ SQL;
 SQL;
         $sql = $select . $sql . $groupby . ';';
 
-        // if( $this->countsOnly ){
-        //     $sql .= 'GROUP BY ds_date, dst_name;';
-        // } else {
-        //     $sql .= ';';
-        // }
-        // $sql = "SELECT * FROM stat_daily_stats WHERE ( ds_timestamp > :dateStart AND ds_timestamp < :dateEnd );";
         $statement = $this->conn->prepare( $sql );
 
         $endTime = $this->dateEnd . ' 23:59:59';
@@ -246,7 +253,6 @@ SQL;
         $goForExecute = $statement->bindParam( ':dateStart', $this->dateStart, PDO::PARAM_STR );
         $goForExecute = $goForExecute && $statement->bindParam( ':dateEnd', $endTime, PDO::PARAM_STR );
         $goForExecute = $goForExecute && $statement->bindParam( ':branchAbbr', $this->branchAbbr, PDO::PARAM_STR );
-        // print_r($statement);
 
         $result = false;
 
