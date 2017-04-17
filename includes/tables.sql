@@ -76,6 +76,14 @@ CREATE TABLE stat_service_points(
     desks_id int unsigned,
 
     --
+    -- Service point enabled
+    --
+    -- Tells whether or not the service point is currently in use. If set to 0
+    -- (false) then any statistic that tries to record using the service point
+    -- should fail.
+    sp_enabled boolean NOT NULL DEFAULT 1,
+
+    --
     -- Link to branch. If a branch is deleted then all of its service points are
     -- also removed.
     FOREIGN KEY fk_branch(branches_id)

@@ -30,7 +30,7 @@ class DailyStatsHandlerTest extends TestCase{
     /**
      * Valid requests
      */
-    private $validRequests = [
+    private $validGetRequests = [
         [
             "request" => "branch/" . self::BRANCH_ABBR,
             "counts" => false
@@ -127,10 +127,10 @@ class DailyStatsHandlerTest extends TestCase{
  * Test valid requests
  ***********************/
     /**
-     * @test Valid requests are parsed
+     * @test Valid GET requests are parsed
      */
     public function valid_get_requests_are_good(){
-        foreach( $this->validRequests as $request ){
+        foreach( $this->validGetRequests as $request ){
             $params = explode( '/', $request["request"] );
             $dsHandler = new DailyStatsHandler( 'get', $params );
 
@@ -186,7 +186,7 @@ class DailyStatsHandlerTest extends TestCase{
      * @test Make sure isDateRange detects valid single date.
      */
     public function isDateRange_detects_valid_single_date( $dsHandler ){
-        $params = explode( '/', $this->validRequests[0]['request'] );
+        $params = explode( '/', $this->validGetRequests[0]['request'] );
         $dsHandler = new DailyStatsHandler( 'get', $params );
 
         $this->assertTrue( $dsHandler->isDateRange( self::VALID_START_DATE ), '*** Valid date flagged invalid' );
@@ -211,7 +211,7 @@ class DailyStatsHandlerTest extends TestCase{
      *  falls through.
      */
     public function isDateRange_passes_fuzzing( ){
-        $params = explode( '/', $this->validRequests[0]['request'] );
+        $params = explode( '/', $this->validGetRequests[0]['request'] );
         $dsHandler = new DailyStatsHandler( 'get', $params );
 
         // Test length of valid date (8 chars)
@@ -242,7 +242,7 @@ class DailyStatsHandlerTest extends TestCase{
      * @test Benchmark for isDateRange
      */
     public function isDateRange_benchmark( ){
-        $params = explode( '/', $this->validRequests[0]['request'] );
+        $params = explode( '/', $this->validGetRequests[0]['request'] );
         $dsHandler = new DailyStatsHandler( 'get', $params );
 
         for ($i=0; $i < 10000; $i++) { 

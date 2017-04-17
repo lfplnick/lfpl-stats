@@ -7,7 +7,7 @@
  * the database.
  */
 
-require_once 'LocalSettings.php';
+require_once __DIR__ . '/../LocalSettings.php';
 
 class DailyStatistic {
     /**
@@ -83,7 +83,7 @@ class DailyStatistic {
             return false;
         }
 
-        $sql = "INSERT INTO stat_daily_stats ( dst_id, hsp_id ) VALUES ( :dstId, :spId )";
+        $sql = "INSERT INTO stat_daily_stats ( dst_id, sp_id ) VALUES ( :dstId, :spId )";
         $statement = $conn->prepare($sql);
 
         $goForExecute = true;
