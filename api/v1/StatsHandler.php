@@ -142,4 +142,62 @@ abstract class StatsHandler{
             }
         }
     }
+
+    public function servicePointEnabled( $sp_id ){
+        $args = array(
+            'table' => 'stat_service_points',
+            'enabledField' => 'sp_enabled',
+            'idField' => 'sp_id',
+            'id' => $sp_id
+        );
+        return $this->helper_checkEnabled( $args );
+    }
+
+    public function dailyStatTypeEnabled( $dst_id ){
+        $args = array(
+            'table' => 'stat_daily_stat_types',
+            'enabledField' => 'dst_enabled',
+            'idField' => 'dst_id',
+            'id' => $dst_id
+        );
+        return $this->helper_checkEnabled( $args );
+    }
+
+    private function helper_checkEnabled( $args ){
+        $table = $args['table'];
+        $enabledField = $args['enabledField'];
+        $idField = $args['idField'];
+        $id = $args['id'];
+
+        if( !is_numeric( $id ) ){ return false; }
+
+        $this->getConnection();
+        $sql = 'SELECT ' . $enabledField . ' AS enabled FROM ' . $table . ' WHERE ' . $idField . ' = :dstId;';
+
+        $statement = $this->conn->prepare( $sql );
+        $goForExecute = $statement->bindParam( ':dstId', $id, PDO::PARAM_INT );
+
+
+        $result = false;
+
+        if( $goForExecute ){
+            $result = $statement->execute();
+        }
+
+        if( !$goForExecute || !$result ) {
+            $this->responseCode = 500;
+            $this->response = 'Could not execute query string.';
+            $this->sendResponse();
+        }
+
+        $records = $statement->fetchAll( PDO::FETCH_ASSOC );
+
+        $enabled = $records[0]['enabled'];
+        $isEnabled = false;
+        if( $enabled == 1 ){
+            $isEnabled = true;
+        }
+
+        return $isEnabled;
+    }
 }
