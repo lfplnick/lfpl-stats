@@ -143,6 +143,45 @@ class DailyStatsHandlerTest extends TestCase{
     }
 
     /**
+     * @test Valid POST requests are parsed
+     */
+    public function valid_post_requests_are_good(){
+        $_POST = array(
+            'servicepoint' => '1',
+            'dstype' => '1'
+        );
+
+        $params = explode( '/', 'branch');
+        $dsHandler = new DailyStatsHandler( 'post', $params);
+
+        $this->assertTrue( $dsHandler->requestIsGood(), "*** POST request not marked good");
+    }
+
+    /**
+     * @group db
+     * @test Correctly reports if service points are enabled
+     */
+    public function test_servicePointEnabled(){
+        $params = explode( '/', 'branch/' . self::BRANCH_ABBR );
+        $dsHandler = new DailyStatsHandler( 'post', $params );
+
+        $this->assertTrue( $dsHandler->servicePointEnabled( '1' ), "*** Enabled service point marked disabled" );
+        $this->assertFalse( $dsHandler->servicePointEnabled( '47' ), "*** Disabled service point marked enabled" );
+    }
+
+    /**
+     * @group db
+     * @test Correctly reports if service points are enabled
+     */
+    public function test_dailyStatTypeEnabled(){
+        $params = explode( '/', 'branch/' . self::BRANCH_ABBR );
+        $dsHandler = new DailyStatsHandler( 'post', $params );
+
+        $this->assertTrue( $dsHandler->dailyStatTypeEnabled( '1' ), "*** Enabled daily stat type marked disabled" );
+        $this->assertFalse( $dsHandler->dailyStatTypeEnabled( '7' ), "*** Disabled daily stat type marked enabled" );
+    }
+
+    /**
      * @test Branch stats request for current day is correctly parsed
      */
     public function request_for_todays_branch_stats_is_correctly_parsed(){

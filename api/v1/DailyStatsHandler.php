@@ -24,6 +24,11 @@ class DailyStatsHandler extends StatsHandler {
      */
     protected $dateEnd;
 
+    /**
+     * DailyStatistic $ds
+     */
+    protected $ds;
+
     public function __construct( $method, $request ){
         $this->dateStart = date( 'Y-m-d' );
         $this->dateEnd = $this->dateStart;
@@ -42,6 +47,10 @@ class DailyStatsHandler extends StatsHandler {
         switch( strtolower( $this->method ) ){
             case 'get':
                 $this->handleGetRequest();
+                break;
+
+            case 'post':
+                $this->handlePostRequest();
                 break;
 
             default:
@@ -64,7 +73,8 @@ class DailyStatsHandler extends StatsHandler {
                 // set primary resource
                 $this->primaryResource = 'branch';
 
-                if(     $this->method === 'get'){ $this->parseGetBranch(); }
+                if( $this->method === 'get'){ $this->parseGetBranch(); }
+                elseif( $this->method === 'post' ){ $this->parsePostBranch(); }
                 else{ $this->requestGood = self::REQUEST_NOGOOD; }
                 break;
             // End 'branch' case
@@ -81,6 +91,32 @@ class DailyStatsHandler extends StatsHandler {
             // End default case
         }// End primary resource switch
     }// end getParameters()
+
+    private function parsePostBranch(){
+        // this should only be called if method is 'post' and primary resource
+        // is 'branch'
+        if( ( $this->method !== 'post' ) || ( $this->primaryResource !== 'branch' ) ){
+            return false;
+        }
+
+        $nextParam = $this->nextParam();
+        if( $nextParam === false ){
+            $this->initStatistic();
+            if( !( $this->ds instanceof DailyStatistic ) ){
+                $this->requestGood = self::REQUEST_NOGOOD;
+                return;
+            }
+        }
+
+        if( $this->nextParam() === false ){
+            $this->requestGood = self::REQUEST_GOOD;
+            return;
+        }
+
+        // good requests shouldn't get this far
+        $this->requestGood = self::REQUEST_NOGOOD;
+
+    }// end parsePostBranch
 
     private function parseGetBranch(){
         // this function should only be called if method is 'get' and primary
@@ -195,6 +231,40 @@ class DailyStatsHandler extends StatsHandler {
         return $this->helper_parseDateRange( $dateRange, 'end' );
     }
 
+    protected function initStatistic(){
+        $checksGood = array_key_exists( 'servicepoint', $_POST );
+        $checksGood = $checksGood && array_key_exists( 'dstype', $_POST );
+
+        if( $checksGood !== true ){
+            return false;
+        }
+
+        $sp_id = $_POST['servicepoint'];
+        $dst_id = $_POST['dstype'];
+
+        if( !$this->servicePointEnabled( $sp_id ) ){
+            $this->responseCode = 400;
+            $this->response = 'Service point not enabled.';
+            $this->sendResponse();
+            exit();
+        }
+
+        if( !$this->dailyStatTypeEnabled( $dst_id ) ){
+            $this->responseCode = 400;
+            $this->response = 'Daily stat type not enabled.';
+            $this->sendResponse();
+            exit();
+        }
+
+        $dsArgs = array(
+            'servicepointid' => $sp_id,
+            'stattypeid' => $dst_id
+        );
+        $this->ds = new DailyStatistic( $dsArgs );
+    }
+
+
+
 /***********************
  * Method handlers
  ***********************/
@@ -273,6 +343,22 @@ SQL;
         echo( json_encode($records) );
         
 
+    }// end handleGetRequest()
+
+    /**
+     * Handler for POST requests
+     */
+    protected function handlePostRequest(){
+        $result = $this->ds->record();
+
+        if( $result === false ){
+            $this->responseCode = 500;
+            $this->response = 'Unable to record statistic.';
+        } else {
+            $this->responseCode = 200;
+        }
+
+        $this->sendResponse();
     }
 
     /**
