@@ -83,3 +83,15 @@ INSERT INTO stat_service_points ( sp_name, branches_id, desks_id ) VALUES
  ( 'Circulation', 18, 2 ),
  ( 'Reference', 18, 1 );
 
+INSERT INTO stat_outreach_primary_type ( opt_name ) VALUES
+ ( 'Adult Outreach' ),  -- 1
+ ( 'Youth Outreach' );  -- 2
+
+INSERT INTO stat_outreach_secondary_type ( ost_name, opt_id ) VALUES
+ ( 'Homebound', 1 ),
+ ( 'AOS Stop', 1 ),
+ ( 'Community Event', 1 ),
+ ( 'Community Group', 1 ),
+ ( 'Bookmobile Stop', 2 ),
+ ( 'School Visit', 2 ),
+ ( 'Daycare Visit', 2 );

@@ -1,0 +1,134 @@
+Below is a list of urls that are supported by version 1 of the API. 
+
+
+======================================
+Retrieving individual daily statistics
+======================================
+--------------------------------------------------------------------------------
+URL
+  https://www.here.com/api/v1/index.php?whatitdo=stats/ds/branch/{br.abbr}
+
+Use
+  Replace {br.abbr} with the branch abbreviation. This will return all daily
+  statistics for the current day.
+
+Variables
+    br.abbr:
+           Branch abbreviation
+
+Fields returned
+    ds_id: Statistic id
+
+    ds_timestamp:
+           Date and time statistic was entered
+
+    dst_name:
+           The type of question answered
+
+    sp_id: Service point ID
+
+    sp_name:
+           Service point name
+
+    branches_id:
+           Branch ID
+
+    branches_name:
+           Branch name
+
+--------------------------------------------------------------------------------
+URL
+  https://www.here.com/api/v1/index.php?whatitdo=stats/ds/branch/{br.abbr}/{yyyymmdd}
+
+Use
+  This will return the same data as above, but for the specified date. Date must
+  be formated with the four-digit year, two-digit month, and the two-digit day.
+
+Variables
+    br.abbr:
+           Branch abbreviation
+
+    yyyymmdd:
+           Date to pull statistics for. Must be formated with the four-digit
+           year, two-digit month, and the two-digit day (ex: 20170402 for April
+           2, 2017).
+
+Fields returned
+    Same as above.
+
+
+===========================
+Retrieving statistic counts
+===========================
+When counts for a single day are requested the counts are grouped by hour and
+question type. If a date range is requested then the counts are grouped by date
+and question type. Note that a count will be returned for date ranges even if
+a count is not requested.
+
+--------------------------------------------------------------------------------
+URL
+  https://www.here.com/api/v1/index.php?whatitdo=stats/ds/branch/{br.abbr}/counts
+
+Use
+  Returns hourly counts for the current day. 
+
+Variables
+    br.abbr:
+           Branch abbreviation
+
+Fields returned
+    hour:  Hour that statistics were recorded
+
+    dst_name:
+           The type of question answered
+
+    count: Number of questions answered that hour
+
+--------------------------------------------------------------------------------
+URL
+  https://www.here.com/api/v1/index.php?whatitdo=stats/ds/branch/{br.abbr}/{yyyymmdd}/counts
+
+Use
+  Returns hourly counts for the requested date. Date must be formatted with the
+  four-digit year, two-digit month, and the two-digit day.
+
+Variables
+    br.abbr:
+           Branch abbreviation
+
+    yyyymmdd:
+           Date to pull counts for. Must be formated with the four-digit year,
+           two-digit month, and the two-digit day (ex: 20170402 for April 2,
+           2017).
+
+Fields returned
+    Same as above.
+
+--------------------------------------------------------------------------------
+URL
+  https://www.here.com/api/v1/index.php?whatitdo=stats/ds/branch/{br.abbr}/{yyyymmdd-yyyymmdd}/counts
+  https://www.here.com/api/v1/index.php?whatitdo=stats/ds/branch/{br.abbr}/{yyyymmdd-yyyymmdd}
+
+Use
+  Returns daily counts for the requested date range. Note that if the start date
+  and end date are the same then it will be treated as a single date. This will
+  change the fields returned, so watch out for that.
+
+
+Variables
+    br.abbr:
+           Branch abbreviation
+
+    yyyymmdd-yyyymmdd:
+           Date range to pull counts for. Must be formatted with four-digit
+           years, two-digit months, and two-digit days. Date range is inclusive
+           and will pull data from the beginning of the start date to the end of
+           the end date.
+
+Fields returned
+    date:  Date that statistics were recorded
+
+    dst_name:
+           The type of question answered
+
+    count: Number of questions answered that day
