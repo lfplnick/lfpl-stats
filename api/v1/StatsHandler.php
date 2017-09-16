@@ -96,7 +96,6 @@ abstract class StatsHandler{
     }
 
     protected function getConnection(){
-        // global $sgDbName, $sgDbHost, $sgDbPort, $sg_mysql_statsName, $sg_mysql_statsPw;
         if( isset( $this->conn ) ){ return; }
 
         $connectionString =
