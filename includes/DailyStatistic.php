@@ -72,11 +72,13 @@ class DailyStatistic {
      * Record statistic to the daily_stats table.
      */
     public function record() {
-        global $sgDbName, $sgDbHost, $sgDbPort, $sg_mysql_statsName, $sg_mysql_statsPw;
-        $connectionString = "mysql:host={$sgDbHost};port={$sgDbPort};dbname={$sgDbName}";
+        $connectionString =
+            "mysql:host=" . LocalSettings::$dbHost . ";" .
+            "port=" . LocalSettings::$dbPort . ";" .
+            "dbname=" . LocalSettings::$dbName;
 
         try {
-            $conn = new PDO( $connectionString, $sg_mysql_statsName, $sg_mysql_statsPw );
+            $conn = new PDO( $connectionString, LocalSettings::$dbUser, LocalSettings::$dbPw );
             $conn->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
         } catch ( PDOException $e ) {
             // @todo Handle this better.

@@ -96,13 +96,16 @@ abstract class StatsHandler{
     }
 
     protected function getConnection(){
-        global $sgDbName, $sgDbHost, $sgDbPort, $sg_mysql_statsName, $sg_mysql_statsPw;
+        // global $sgDbName, $sgDbHost, $sgDbPort, $sg_mysql_statsName, $sg_mysql_statsPw;
         if( isset( $this->conn ) ){ return; }
 
-        $connectionString = "mysql:host={$GLOBALS['sgDbHost']};port={$GLOBALS['sgDbPort']};dbname={$GLOBALS['sgDbName']}";
+        $connectionString =
+            "mysql:host=" . LocalSettings::$dbHost .
+            ";port=" . LocalSettings::$dbPort .
+            ";dbname=" . LocalSettings::$dbName . "";
 
         try{
-            $this->conn = new PDO( $connectionString, $GLOBALS['sg_mysql_statsName'], $GLOBALS['sg_mysql_statsPw'] );
+            $this->conn = new PDO( $connectionString, LocalSettings::$dbUser, LocalSettings::$dbPw );
             $this->conn->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
         } catch( PDOException $e ){
             print_r( $e );
