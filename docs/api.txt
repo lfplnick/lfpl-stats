@@ -5,7 +5,7 @@ Below is a list of urls that are supported by version 1 of the API.
 Retrieving individual daily statistics
 ======================================
 --------------------------------------------------------------------------------
-URL
+URL (GET)
   https://www.here.com/api/v1/index.php?whatitdo=stats/ds/branch/{br.abbr}
 
 Use
@@ -37,7 +37,7 @@ Fields returned
            Branch name
 
 --------------------------------------------------------------------------------
-URL
+URL (GET)
   https://www.here.com/api/v1/index.php?whatitdo=stats/ds/branch/{br.abbr}/{yyyymmdd}
 
 Use
@@ -66,7 +66,7 @@ and question type. Note that a count will be returned for date ranges even if
 a count is not requested.
 
 --------------------------------------------------------------------------------
-URL
+URL (GET)
   https://www.here.com/api/v1/index.php?whatitdo=stats/ds/branch/{br.abbr}/counts
 
 Use
@@ -85,7 +85,7 @@ Fields returned
     count: Number of questions answered that hour
 
 --------------------------------------------------------------------------------
-URL
+URL (GET)
   https://www.here.com/api/v1/index.php?whatitdo=stats/ds/branch/{br.abbr}/{yyyymmdd}/counts
 
 Use
@@ -105,7 +105,7 @@ Fields returned
     Same as above.
 
 --------------------------------------------------------------------------------
-URL
+URL (GET)
   https://www.here.com/api/v1/index.php?whatitdo=stats/ds/branch/{br.abbr}/{yyyymmdd-yyyymmdd}/counts
   https://www.here.com/api/v1/index.php?whatitdo=stats/ds/branch/{br.abbr}/{yyyymmdd-yyyymmdd}
 
@@ -132,3 +132,27 @@ Fields returned
            The type of question answered
 
     count: Number of questions answered that day
+
+
+============================
+Posting new daily statistics
+============================
+--------------------------------------------------------------------------------
+URL (POST)
+  https://www.here.com/api/v1/index.php?whatitdo=stats/ds/stat/new
+
+Use
+  Adds a new daily statistic to the database. Timestamp info is added
+  automatically and cannot be overridden at this time. Service point and daily
+  statistic type must both be enabled for statistic to be recorded.
+
+POST Variables
+    servicepoint:
+           Service point ID
+
+    dstype:
+          Statistic type ID
+
+Fields returned
+    dst_id:
+          Record ID of new daily statistic.
