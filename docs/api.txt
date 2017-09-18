@@ -6,7 +6,7 @@ Retrieving individual daily statistics
 ======================================
 --------------------------------------------------------------------------------
 URL (GET)
-  https://www.here.com/api/v1/index.php?whatitdo=stats/ds/branch/{br.abbr}
+  https://www.example.com/api/v1/index.php?whatitdo=stats/ds/branch/{br.abbr}
 
 Use
   Replace {br.abbr} with the branch abbreviation. This will return all daily
@@ -38,7 +38,7 @@ Fields returned
 
 --------------------------------------------------------------------------------
 URL (GET)
-  https://www.here.com/api/v1/index.php?whatitdo=stats/ds/branch/{br.abbr}/{yyyymmdd}
+  https://www.example.com/api/v1/index.php?whatitdo=stats/ds/branch/{br.abbr}/{yyyymmdd}
 
 Use
   This will return the same data as above, but for the specified date. Date must
@@ -67,7 +67,7 @@ a count is not requested.
 
 --------------------------------------------------------------------------------
 URL (GET)
-  https://www.here.com/api/v1/index.php?whatitdo=stats/ds/branch/{br.abbr}/counts
+  https://www.example.com/api/v1/index.php?whatitdo=stats/ds/branch/{br.abbr}/counts
 
 Use
   Returns hourly counts for the current day. 
@@ -86,7 +86,7 @@ Fields returned
 
 --------------------------------------------------------------------------------
 URL (GET)
-  https://www.here.com/api/v1/index.php?whatitdo=stats/ds/branch/{br.abbr}/{yyyymmdd}/counts
+  https://www.example.com/api/v1/index.php?whatitdo=stats/ds/branch/{br.abbr}/{yyyymmdd}/counts
 
 Use
   Returns hourly counts for the requested date. Date must be formatted with the
@@ -106,8 +106,8 @@ Fields returned
 
 --------------------------------------------------------------------------------
 URL (GET)
-  https://www.here.com/api/v1/index.php?whatitdo=stats/ds/branch/{br.abbr}/{yyyymmdd-yyyymmdd}/counts
-  https://www.here.com/api/v1/index.php?whatitdo=stats/ds/branch/{br.abbr}/{yyyymmdd-yyyymmdd}
+  https://www.example.com/api/v1/index.php?whatitdo=stats/ds/branch/{br.abbr}/{yyyymmdd-yyyymmdd}/counts
+  https://www.example.com/api/v1/index.php?whatitdo=stats/ds/branch/{br.abbr}/{yyyymmdd-yyyymmdd}
 
 Use
   Returns daily counts for the requested date range. Note that if the start date
@@ -139,7 +139,7 @@ Posting new daily statistics
 ============================
 --------------------------------------------------------------------------------
 URL (POST)
-  https://www.here.com/api/v1/index.php?whatitdo=stats/ds/stat/new
+  https://www.example.com/api/v1/index.php?whatitdo=stats/ds/stat/new
 
 Use
   Adds a new daily statistic to the database. Timestamp info is added
@@ -156,3 +156,24 @@ POST Variables
 Fields returned
     dst_id:
           Record ID of new daily statistic.
+
+
+======================
+Retrieving branch info
+======================
+--------------------------------------------------------------------------------
+<< TODO: NOT IMPLEMENTED >>
+URL (GET)
+  https://www.example.com/api/v1/index.php?whatitdo=branches/list
+
+Use
+  Lists all active branches. Info includes branch name and branch abbreviation.
+
+--------------------------------------------------------------------------------
+<< TODO: NOT IMPLEMENTED >>
+URL (GET)
+  https://www.example.com/api/v1/index.php?whatitdo=branches/{br.abbr}/sp
+
+Use
+  Lists all active service points at given branch. Info includes service point
+  ID, service point name, and desk type (ex. circulation, reference, etc).
