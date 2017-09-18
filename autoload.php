@@ -6,5 +6,6 @@ $sgClasses = [
     'DailyStatistic' => __DIR__ . '/includes/DailyStatistic.php',
     'DailyStatsHandler' => __DIR__ . '/api/v1/DailyStatsHandler.php',
     'InitializeDatabase' => __DIR__ . '/includes/InitializeDatabase.php',
+    'RequestHandler' => __DIR__ . '/api/v1/RequestHandler.php',
     'StatsHandler' => __DIR__ . '/api/v1/StatsHandler.php'
 ];
