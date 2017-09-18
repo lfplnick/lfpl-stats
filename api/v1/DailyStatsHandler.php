@@ -1,6 +1,7 @@
 <?php
 
-class DailyStatsHandler extends StatsHandler {
+class DailyStatsHandler extends StatsHandler
+{
     protected $primaryResource;
     protected $branchAbbr;
 
@@ -343,7 +344,7 @@ SQL;
         $records = $statement->fetchAll( PDO::FETCH_ASSOC );
 
         $this->responseCode = 200;
-        header( 'Content-Type: application/json' );
+        header( 'Content-Type: application/json', true, $this->responseCode );
         echo( json_encode($records) );
         
 

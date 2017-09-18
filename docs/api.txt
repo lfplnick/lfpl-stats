@@ -162,7 +162,6 @@ Fields returned
 Retrieving branch info
 ======================
 --------------------------------------------------------------------------------
-<< TODO: NOT IMPLEMENTED >>
 URL (GET)
   https://www.example.com/api/v1/index.php?whatitdo=branches/list
 
@@ -172,8 +171,12 @@ Use
 --------------------------------------------------------------------------------
 << TODO: NOT IMPLEMENTED >>
 URL (GET)
-  https://www.example.com/api/v1/index.php?whatitdo=branches/{br.abbr}/sp
+  https://www.example.com/api/v1/index.php?whatitdo=branches/sp/{br.abbr}
 
 Use
   Lists all active service points at given branch. Info includes service point
   ID, service point name, and desk type (ex. circulation, reference, etc).
+
+Variables
+    br.abbr:
+           Branch abbreviation

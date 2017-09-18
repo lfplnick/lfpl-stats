@@ -18,7 +18,8 @@ if ( !isset( $apiSet ) || !isset( $baseResource ) ){
 
 switch( strtolower( $apiSet ) ){
     case 'stats':
-        switch( strtolower( $baseResource ) ){
+        switch( strtolower( $baseResource ) )
+        {
             case 'ds':
                 $handler = new DailyStatsHandler( $method, $itdo );
                 break;
@@ -30,6 +31,19 @@ switch( strtolower( $apiSet ) ){
         }
         break;
 
+    case 'branches':
+        switch( strtolower( $baseResource))
+        {
+            case 'list':
+                $handler = new BranchesHandler( $method, $itdo );
+                break;
+
+            default:
+                http_response_code( 400 );
+                die( 'Unknown resource.' );
+                break;
+        }
+        break;
 
     default:
         http_response_code( 400 );
