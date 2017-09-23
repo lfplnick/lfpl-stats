@@ -2,6 +2,12 @@
 
 class BranchesHandler extends RequestHandler
 {
+
+    /**
+     * @var string
+     */
+    protected $branchID;
+
     private function notImplemented()
     {
         $this->responseCode = 501;
@@ -11,13 +17,9 @@ class BranchesHandler extends RequestHandler
 
     public function __construct( $method, $request )
     {
-        $this->baseResource = 'branches';
         parent::__construct( $method, $request );
     }
 
-    /**
-     * TODO: Implement handler
-     */
     public function handle()
     {
         switch( strtolower( $this->method ) ) 
@@ -33,26 +35,69 @@ class BranchesHandler extends RequestHandler
         }
     }// end handle()
 
-    /**
-     * TODO: handle 
-     */
     protected function getParameters()
     {
         $nextParam = $this->nextParam();
 
-        switch ( $nextParam )
+        if( $nextParam === false ) // this needs to be a strict comparison, i.e. not in switch
         {
-            case false:
-                $this->primaryResource = 'branch';
-                $this->requestGood = self::REQUEST_GOOD;
-                break;
+            $this->requestGood = self::REQUEST_NOGOOD;            
+        } else {
+            switch ( $nextParam )
+            {
+                case 'list':
+                    $this->baseResource = 'branch';
+                    $this->requestGood = self::REQUEST_GOOD;
+                    break;
 
-            default:
-                $this->requestGood = self::REQUEST_NOGOOD;
-                break;
-                
-        }
+                default:
+                    $branchInfo = $this->lookupBranch(
+                        array( 'branches_abbr' => $nextParam )
+                    );
+
+                    if( $branchInfo === false )
+                    {
+                        $this->requestGood = self::REQUEST_NOGOOD;
+                    } else {
+                        $this->branchID = $branchInfo[0][ 'branches_id' ];
+                        $this->getBranchParameters();
+                    }
+                    break;
+
+            }// end switch nextParam
+        }// end else nextParam !== false
     }// end getParameters()
+
+    /**
+     * Parses parameters for service point base resource.
+     */
+    protected function getBranchParameters()
+    {
+        if( $this->method === 'get' )
+        {
+            $nextParam = $this->nextParam();
+            switch( $nextParam )
+            {
+                case false:
+                    $this->requestGood = self::REQUEST_NOGOOD;
+                    break;
+
+                case 'sp': // generate a list of service points for the given branch
+                    $this->baseResource = 'service point';
+                    if( $this->nextParam() === false )
+                    {
+                        $this->requestGood = self::REQUEST_GOOD;
+                    } else {
+                        $this->requestGood = self::REQUEST_NOGOOD;
+                    }
+                    break;
+
+                default:
+                    $this->requestGood = self::REQUEST_NOGOOD;
+                    break;
+            }// switch nextParam
+        }// method === 'get'
+    }// end getBranchParameters
 
 /***********************
  * Method handlers
@@ -62,7 +107,7 @@ class BranchesHandler extends RequestHandler
      */
      protected function handleGetRequest()
      {
-        if( $primaryResource = 'branch' )
+        if( $this->baseResource === 'branch' )
         {
             $this->getConnection();
             $sql = 'select `branches_name`, `branches_abbr` from `stat_branches`;';
@@ -82,7 +127,37 @@ class BranchesHandler extends RequestHandler
             echo( json_encode( $branches ) );
 
 
-        }// primaryResource = 'branch'
+        }// baseResource === 'branch'
+        elseif( $this->baseResource === 'service point' )
+        {
+            $this->getConnection();
+
+            $sql = <<<SQL
+                SELECT `ssp`.`sp_id`, `ssp`.`sp_name`, `sd`.`desks_type`
+                FROM `stat_service_points` AS `ssp`
+                LEFT JOIN `stat_desks` AS `sd` ON `ssp`.`desks_id` = `sd`.`desks_id`
+                LEFT JOIN `stat_branches` AS `sb` ON `ssp`.`branches_id` = `sb`.`branches_id`
+                WHERE `sb`.`branches_id` = :branchId ;
+SQL;
+
+            $statement = $this->conn->prepare( $sql );
+            $goForExecute = $statement->bindValue( ':branchId', $this->branchID, PDO::PARAM_INT );
+
+            if( $goForExecute === false )
+            {
+                $this->responseCode = 400;
+                $this->response = 'Could not execute query string.';
+                $this->sendResponse();
+            }
+
+            $statement->execute();
+
+            $this->response = json_encode(
+                $statement->fetchAll( PDO::FETCH_ASSOC )
+            );
+            $this->responseCode = 200;
+            $this->sendResponse( 'json' );
+        }// baseResource === 'service point'
         else
         {
             $this->responseCode = 400;

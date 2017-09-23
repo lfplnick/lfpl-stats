@@ -6,7 +6,7 @@ require_once __DIR__ . '/../../LocalSettings.php';
 abstract class RequestHandler
 {
     /**
-     * bool Whether or not the request was able to be parsed
+     * @var bool Whether or not the request was able to be parsed
      */
     const REQUEST_NOGOOD = false;
     const REQUEST_GOOD   = true;
@@ -36,7 +36,8 @@ abstract class RequestHandler
 
     /**
     * @var string $baseResource Primary resource that client is working with.
-    *  Ex., daily stats, service points, etc. 
+    *  Ex., daily stats, service points, etc. This should generally be a good
+    *  indicator of which database we'll be working with.
     */
    protected $baseResource;  
 
@@ -87,9 +88,14 @@ abstract class RequestHandler
         return !$this->requestGood;
     }
 
-    public function sendResponse(){
+    public function sendResponse( $contentType = null ){
         $this->conn = null;
-        http_response_code( $this->responseCode );
+        if( $contentType === 'json' )
+        {
+            header( 'Content-Type: application/json', true, $this->responseCode );
+        } else {
+            http_response_code( $this->responseCode );
+        }
         if( isset( $this->response ) ){
            echo $this->response;
         }
@@ -228,7 +234,7 @@ abstract class RequestHandler
 
     /**
      * Searches for branch. Note that wildcards are not allowed.
-     * @return [json|bool] If branch is found then its id, name, and
+     * @return [array|bool] If branch is found then its id, name, and
      * abbreviation is returned, otherwise false is returned if branch is not
      * found.
      * @param array $args Associative array of arguments. Possible arguments
@@ -334,9 +340,9 @@ SQL;
             if ( $statement->execute() )
             {
                 $records = $statement->fetchAll( PDO::FETCH_ASSOC );
-                if ( count( $records) > 0 )
+                if ( count( $records) === 1 )
                 {
-                    $return = json_encode( $records );
+                    $return = $records;
                 }
             }
         }

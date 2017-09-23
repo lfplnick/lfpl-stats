@@ -31,12 +31,16 @@ switch( strtolower( $apiSet ) ){
         }
         break;
 
-    case 'branches':
+    case 'sys':
         switch( strtolower( $baseResource))
         {
-            case 'list':
+            case 'branch':
                 $handler = new BranchesHandler( $method, $itdo );
                 break;
+
+            // case 'sp':
+            //     $handler = new ServicePointHandler( $method, $itdo );
+            //     break;
 
             default:
                 http_response_code( 400 );
@@ -51,7 +55,7 @@ switch( strtolower( $apiSet ) ){
         break;
 }
 
-if( $handler->requestIsGood() === StatsHandler::REQUEST_GOOD ){
+if( $handler->requestIsGood() === RequestHandler::REQUEST_GOOD ){
     $handler->handle();
 } else {
     http_response_code( 400 );

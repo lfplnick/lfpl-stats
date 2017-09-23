@@ -163,15 +163,14 @@ Retrieving branch info
 ======================
 --------------------------------------------------------------------------------
 URL (GET)
-  https://www.example.com/api/v1/index.php?whatitdo=branches/list
+  https://www.example.com/api/v1/index.php?whatitdo=sys/branch/list
 
 Use
   Lists all active branches. Info includes branch name and branch abbreviation.
 
 --------------------------------------------------------------------------------
-<< TODO: NOT IMPLEMENTED >>
 URL (GET)
-  https://www.example.com/api/v1/index.php?whatitdo=branches/sp/{br.abbr}
+  https://www.example.com/api/v1/index.php?whatitdo=sys/branch/{br.abbr}/sp
 
 Use
   Lists all active service points at given branch. Info includes service point

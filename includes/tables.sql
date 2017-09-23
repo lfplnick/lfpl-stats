@@ -22,7 +22,10 @@ CREATE TABLE stat_branches(
     --
     -- Most branches have a digit abbreviation which may be easier to use for
     -- identifying a branch, or at least less ambiguous than the spelling.
-    branches_abbr varchar(255)
+    branches_abbr varchar(255),
+
+    -- This can be used for identifying branches, thus should be unique.
+    UNIQUE ( branches_abbr )
 
 )ENGINE=InnoDB;
 
