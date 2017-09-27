@@ -110,7 +110,12 @@ class BranchesHandler extends RequestHandler
         if( $this->baseResource === 'branch' )
         {
             $this->getConnection();
-            $sql = 'select `branches_name`, `branches_abbr` from `stat_branches`;';
+            $sql = <<<SQL
+                SELECT `branches_name`, `branches_abbr`
+                FROM `stat_branches`
+                WHERE `branches_enabled` = 1;
+SQL;
+
             $statement = $this->conn->prepare( $sql );
             
             $result = $statement->execute();

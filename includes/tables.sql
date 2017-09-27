@@ -24,6 +24,14 @@ CREATE TABLE stat_branches(
     -- identifying a branch, or at least less ambiguous than the spelling.
     branches_abbr varchar(255),
 
+    --
+    -- Branch enabled
+    --
+    -- Tells whether or not the branch is currently in operation. If set to 0
+    -- (false) then all service points at the branch should also be disabled
+    -- (i.e. sp_enabled = 0).
+    branches_enabled boolean NOT NULL DEFAULT 1,
+
     -- This can be used for identifying branches, thus should be unique.
     UNIQUE ( branches_abbr )
 
