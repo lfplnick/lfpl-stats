@@ -4,9 +4,9 @@ class BranchesHandler extends RequestHandler
 {
 
     /**
-     * @var string
+     * @var Branch The Branch object that request pertains to
      */
-    protected $branchID;
+    protected $branch;
 
     private function notImplemented()
     {
@@ -51,15 +51,16 @@ class BranchesHandler extends RequestHandler
                     break;
 
                 default:
-                    $branchInfo = $this->lookupBranch(
-                        array( 'branches_abbr' => $nextParam )
-                    );
+                    $this->branch = ( new Branch )
+                        ->setId( $nextParam )
+                        ->search()
+                    ;
 
-                    if( $branchInfo === false )
+                    if( $this->branch === false
+                      || $this->branch->doesNotExist() )
                     {
                         $this->requestGood = self::REQUEST_NOGOOD;
                     } else {
-                        $this->branchID = $branchInfo[0][ 'branches_id' ];
                         $this->getBranchParameters();
                     }
                     break;
@@ -92,6 +93,11 @@ class BranchesHandler extends RequestHandler
                     }
                     break;
 
+                case 'info': // fetch branch info, i.e. id, name, abbr
+                    $this->baseResource = 'branch info';
+                    $this->requestGood = self::REQUEST_GOOD;
+                    break;
+
                 default:
                     $this->requestGood = self::REQUEST_NOGOOD;
                     break;
@@ -105,8 +111,8 @@ class BranchesHandler extends RequestHandler
     /**
      * Handler for GET requests
      */
-     protected function handleGetRequest()
-     {
+    protected function handleGetRequest()
+    {
         if( $this->baseResource === 'branch' )
         {
             $this->getConnection();
@@ -146,7 +152,11 @@ SQL;
 SQL;
 
             $statement = $this->conn->prepare( $sql );
-            $goForExecute = $statement->bindValue( ':branchId', $this->branchID, PDO::PARAM_INT );
+            $goForExecute = $statement->bindValue(
+                ':branchId',
+                $this->branch->getId(),
+                PDO::PARAM_INT
+            );
 
             if( $goForExecute === false )
             {
@@ -163,11 +173,22 @@ SQL;
             $this->responseCode = 200;
             $this->sendResponse( 'json' );
         }// baseResource === 'service point'
+        elseif ( $this->baseResource === 'branch info' )
+        {
+            $this->response = array();
+            $this->response['branches_id'] = $this->branch->getId();
+            $this->response['branches_name'] = $this->branch->getName();
+            $this->response['branches_abbr'] = $this->branch->getAbbr();
+            $this->response['branches_enabled'] = $this->branch->enabled();
+
+            $this->response = json_encode( $this->response );
+            $this->responseCode = 200;
+            $this->sendResponse( 'json' );
+        }
         else
         {
             $this->responseCode = 400;
             $this->sendResponse();
         }
-     }
-        
+    }//handleGetRequest
 }

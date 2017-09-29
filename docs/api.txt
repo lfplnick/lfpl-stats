@@ -179,3 +179,17 @@ Use
 Variables
     br.abbr:
            Branch abbreviation
+
+--------------------------------------------------------------------------------
+URL (GET)
+  https://www.example.com/api/v1/index.php?whatitdo=sys/branch/{br.abbr}/info
+
+Use
+  Searches for branch details by branch abbreviation. If branch is found then
+  branch id, branch name, branch abbreviation, and enabled status is returned.
+
+Variables
+    br.abbr:
+           Branch abbreviation
+
+--------------------------------------------------------------------------------
