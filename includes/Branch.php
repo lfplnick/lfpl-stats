@@ -79,6 +79,95 @@ class Branch {
         return !$this->branchExists;
     }
 
+    public function create()
+    {
+        $searchBranch = ( new Branch )
+            ->setName( $this->branchName )
+            ->search()
+        ;
+
+        if( $searchBranch === false )
+        {
+            $this->error = "Error creating branch.";
+            return false;
+        }
+
+        if( $searchBranch->exists() )
+        {
+            $this->error = "Branch already exists.";
+            return false;
+        }
+
+        if( null === $this->branchName )
+        {
+            $this->error = "Not enough information to create new branch.";
+            return false;
+        }
+
+        $conn = Connection::getConnection();
+        if( $conn === false )
+        {
+            $this->error = "Error creating branch.";
+            return false;
+        }
+
+
+        $insert = 'INSERT INTO `stat_branches` ( branches_name';
+        $values = 'VALUES ( :branchName';
+
+        if( null !== $this->getAbbr() )
+        {
+            $insert .= ', branches_abbr';
+            $values .= ', :branchAbbr';
+        }
+
+        if( true === $this->disabled() )
+        {
+            $insert .= ', branches_enabled';
+            $values .= ', 0';
+        }
+
+        $sql = $insert . ' ) ' . $values . ' );';
+
+        $sth = $conn->prepare( $sql );
+
+        $goForExecute = $sth->bindValue(
+            ':branchName',
+            $this->branchName,
+            PDO::PARAM_STR
+        );
+
+        if( null !== $this->getAbbr() )
+        {
+            $goForExecute = $goForExecute &
+                $sth->bindValue(
+                    ':branchAbbr',
+                    $this->branchAbbr,
+                    PDO::PARAM_STR
+                );
+        }
+
+        if( $goForExecute === false )
+        {
+            $this->error = "Error creating branch.";
+            return false;
+        }
+
+        if( $sth->execute() === false )
+        {
+            $this->error = "Error creating branch.";
+            return false;
+        }
+
+        $this->search();
+        if( $this->branchExists === false )
+        {
+            $this->error = "Error creating branch.";
+            return false;
+        }
+
+        return $this;
+    }//create
 
     /**
      * Searches for branch. Note that wildcards are not allowed and that all set
