@@ -22,6 +22,9 @@ CREATE TABLE stat_branches(
     --
     -- Most branches have a digit abbreviation which may be easier to use for
     -- identifying a branch, or at least less ambiguous than the spelling.
+    --
+    -- Note that this should NOT be used to uniquely identify a branch inside
+    -- the database. Use `branches_id` instead.
     branches_abbr varchar(255),
 
     --
@@ -30,10 +33,7 @@ CREATE TABLE stat_branches(
     -- Tells whether or not the branch is currently in operation. If set to 0
     -- (false) then all service points at the branch should also be disabled
     -- (i.e. sp_enabled = 0).
-    branches_enabled boolean NOT NULL DEFAULT 1,
-
-    -- This can be used for identifying branches, thus should be unique.
-    UNIQUE ( branches_abbr )
+    branches_enabled boolean NOT NULL DEFAULT 1
 
 )ENGINE=InnoDB;
 
