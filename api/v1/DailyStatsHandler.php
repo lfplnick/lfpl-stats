@@ -1,6 +1,7 @@
 <?php
 
-class DailyStatsHandler extends StatsHandler {
+class DailyStatsHandler extends StatsHandler
+{
     protected $primaryResource;
     protected $branchAbbr;
 
@@ -74,17 +75,18 @@ class DailyStatsHandler extends StatsHandler {
                 $this->primaryResource = 'branch';
 
                 if( $this->method === 'get'){ $this->parseGetBranch(); }
-                elseif( $this->method === 'post' ){ $this->parsePostBranch(); }
                 else{ $this->requestGood = self::REQUEST_NOGOOD; }
                 break;
             // End 'branch' case
 
             case 'stat':
-                // Not yet implemented
-                $this->requestGood = self::REQUEST_NOGOOD;
+                $this->primaryResource = 'statistic';
+
+                if( $this->method === 'post' ){ $this->parsePostStat(); }
+                else{ $this->requestGood = self::REQUEST_NOGOOD; }
                 break;
             // End 'stat' case
-            
+
             default:
                 $this->requestGood = self::REQUEST_NOGOOD;
                 break;
@@ -92,20 +94,23 @@ class DailyStatsHandler extends StatsHandler {
         }// End primary resource switch
     }// end getParameters()
 
-    private function parsePostBranch(){
+    private function parsePostStat(){
         // this should only be called if method is 'post' and primary resource
-        // is 'branch'
-        if( ( $this->method !== 'post' ) || ( $this->primaryResource !== 'branch' ) ){
+        // is 'statistic'
+        if( ( $this->method !== 'post' ) || ( $this->primaryResource !== 'statistic' ) ){
             return false;
         }
 
         $nextParam = $this->nextParam();
-        if( $nextParam === false ){
+        if( $nextParam === 'new' ){
             $this->initStatistic();
             if( !( $this->ds instanceof DailyStatistic ) ){
                 $this->requestGood = self::REQUEST_NOGOOD;
                 return;
             }
+        } else {
+            $this->requestGood = self::REQUEST_NOGOOD;
+            return;
         }
 
         if( $this->nextParam() === false ){
@@ -116,7 +121,7 @@ class DailyStatsHandler extends StatsHandler {
         // good requests shouldn't get this far
         $this->requestGood = self::REQUEST_NOGOOD;
 
-    }// end parsePostBranch
+    }// end parsePostStat
 
     private function parseGetBranch(){
         // this function should only be called if method is 'get' and primary
@@ -244,14 +249,14 @@ class DailyStatsHandler extends StatsHandler {
 
         if( !$this->servicePointEnabled( $sp_id ) ){
             $this->responseCode = 400;
-            $this->response = 'Service point not enabled.';
+            $this->response = 'Service point not enabled or does not exist.';
             $this->sendResponse();
             exit();
         }
 
         if( !$this->dailyStatTypeEnabled( $dst_id ) ){
             $this->responseCode = 400;
-            $this->response = 'Daily stat type not enabled.';
+            $this->response = 'Daily stat type not enabled or does not exist.';
             $this->sendResponse();
             exit();
         }
@@ -331,7 +336,7 @@ SQL;
         }
 
         if( !$goForExecute || !$result ) {
-            $this->responseCode = 500;
+            $this->responseCode = 400;
             $this->response = 'Could not execute query string.';
             $this->sendResponse();
         }
@@ -339,9 +344,8 @@ SQL;
         $records = $statement->fetchAll( PDO::FETCH_ASSOC );
 
         $this->responseCode = 200;
-        header( 'Content-Type: application/json' );
-        echo( json_encode($records) );
-        
+        $this->response = json_encode( $records );
+        $this->sendResponse( 'json' );        
 
     }// end handleGetRequest()
 
@@ -356,9 +360,10 @@ SQL;
             $this->response = 'Unable to record statistic.';
         } else {
             $this->responseCode = 200;
+            $this->response = json_encode( $result );
         }
 
-        $this->sendResponse();
+        $this->sendResponse( 'json' );
     }
 
     /**

@@ -70,13 +70,18 @@ class DailyStatistic {
 
     /**
      * Record statistic to the daily_stats table.
+     *
+     * @return [int|bool] Returns record ID of inserted row on success or false
+     *  on a failed insert.
      */
     public function record() {
-        global $sgDbName, $sgDbHost, $sgDbPort, $sg_mysql_statsName, $sg_mysql_statsPw;
-        $connectionString = "mysql:host={$sgDbHost};port={$sgDbPort};dbname={$sgDbName}";
+        $connectionString =
+            "mysql:host=" . LocalSettings::$dbHost . ";" .
+            "port=" . LocalSettings::$dbPort . ";" .
+            "dbname=" . LocalSettings::$dbName;
 
         try {
-            $conn = new PDO( $connectionString, $sg_mysql_statsName, $sg_mysql_statsPw );
+            $conn = new PDO( $connectionString, LocalSettings::$dbUser, LocalSettings::$dbPw );
             $conn->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
         } catch ( PDOException $e ) {
             // @todo Handle this better.
@@ -91,12 +96,25 @@ class DailyStatistic {
         $goForExecute = $goForExecute && $statement->bindParam( ':dstId', $this->statTypeId, PDO::PARAM_INT );
         $goForExecute = $goForExecute && $statement->bindParam( ':spId', $this->servicePointId, PDO::PARAM_INT );
 
+        $return = array();
         if ( $goForExecute ) {
-            $result = $statement->execute();
+            try {
+                $conn->beginTransaction();
+                $success = $statement->execute();
+                if ( $success ) {
+                    $return[] = [ 'dst_id' => $conn->lastInsertId() ];
+                } else {
+                    $return = false;
+                }
+                $conn->commit();
+            } catch ( PDOException $e ) {
+                $conn->rollback();
+                $return = false;
+            }
         } else {
-            return false;
+            $return = false;
         }
 
-        return $result;
+        return $return;
     }
 }

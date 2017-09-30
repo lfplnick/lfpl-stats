@@ -5,8 +5,8 @@ Below is a list of urls that are supported by version 1 of the API.
 Retrieving individual daily statistics
 ======================================
 --------------------------------------------------------------------------------
-URL
-  https://www.here.com/api/v1/index.php?whatitdo=stats/ds/branch/{br.abbr}
+URL (GET)
+  https://www.example.com/api/v1/index.php?whatitdo=stats/ds/branch/{br.abbr}
 
 Use
   Replace {br.abbr} with the branch abbreviation. This will return all daily
@@ -37,8 +37,8 @@ Fields returned
            Branch name
 
 --------------------------------------------------------------------------------
-URL
-  https://www.here.com/api/v1/index.php?whatitdo=stats/ds/branch/{br.abbr}/{yyyymmdd}
+URL (GET)
+  https://www.example.com/api/v1/index.php?whatitdo=stats/ds/branch/{br.abbr}/{yyyymmdd}
 
 Use
   This will return the same data as above, but for the specified date. Date must
@@ -66,8 +66,8 @@ and question type. Note that a count will be returned for date ranges even if
 a count is not requested.
 
 --------------------------------------------------------------------------------
-URL
-  https://www.here.com/api/v1/index.php?whatitdo=stats/ds/branch/{br.abbr}/counts
+URL (GET)
+  https://www.example.com/api/v1/index.php?whatitdo=stats/ds/branch/{br.abbr}/counts
 
 Use
   Returns hourly counts for the current day. 
@@ -85,8 +85,8 @@ Fields returned
     count: Number of questions answered that hour
 
 --------------------------------------------------------------------------------
-URL
-  https://www.here.com/api/v1/index.php?whatitdo=stats/ds/branch/{br.abbr}/{yyyymmdd}/counts
+URL (GET)
+  https://www.example.com/api/v1/index.php?whatitdo=stats/ds/branch/{br.abbr}/{yyyymmdd}/counts
 
 Use
   Returns hourly counts for the requested date. Date must be formatted with the
@@ -105,9 +105,9 @@ Fields returned
     Same as above.
 
 --------------------------------------------------------------------------------
-URL
-  https://www.here.com/api/v1/index.php?whatitdo=stats/ds/branch/{br.abbr}/{yyyymmdd-yyyymmdd}/counts
-  https://www.here.com/api/v1/index.php?whatitdo=stats/ds/branch/{br.abbr}/{yyyymmdd-yyyymmdd}
+URL (GET)
+  https://www.example.com/api/v1/index.php?whatitdo=stats/ds/branch/{br.abbr}/{yyyymmdd-yyyymmdd}/counts
+  https://www.example.com/api/v1/index.php?whatitdo=stats/ds/branch/{br.abbr}/{yyyymmdd-yyyymmdd}
 
 Use
   Returns daily counts for the requested date range. Note that if the start date
@@ -132,3 +132,93 @@ Fields returned
            The type of question answered
 
     count: Number of questions answered that day
+
+
+============================
+Posting new daily statistics
+============================
+--------------------------------------------------------------------------------
+URL (POST)
+  https://www.example.com/api/v1/index.php?whatitdo=stats/ds/stat/new
+
+Use
+  Adds a new daily statistic to the database. Timestamp info is added
+  automatically and cannot be overridden at this time. Service point and daily
+  statistic type must both be enabled for statistic to be recorded.
+
+POST Variables
+    servicepoint:
+          [required] Service point ID
+
+    dstype:
+          [required] Statistic type ID
+
+Fields returned
+    dst_id:
+          Record ID of new daily statistic.
+
+
+======================
+Retrieving branch info
+======================
+--------------------------------------------------------------------------------
+URL (GET)
+  https://www.example.com/api/v1/index.php?whatitdo=sys/branch/list
+
+Use
+  Lists all active branches. Info includes branch id, branch name and branch
+  abbreviation.
+
+--------------------------------------------------------------------------------
+URL (GET)
+  https://www.example.com/api/v1/index.php?whatitdo=sys/branch/list/all
+
+Use
+  Lists all branches, including disabled branches. Info includes branch id,
+  branch name, branch abbreviation, and whether branch is enabled or disabled.
+
+--------------------------------------------------------------------------------
+URL (GET)
+  https://www.example.com/api/v1/index.php?whatitdo=sys/branch/{br.abbr}/sp
+
+Use
+  Lists all active service points at given branch. Info includes service point
+  ID, service point name, and desk type (ex. circulation, reference, etc).
+
+Variables
+    br.abbr:
+           Branch abbreviation
+
+--------------------------------------------------------------------------------
+URL (GET)
+  https://www.example.com/api/v1/index.php?whatitdo=sys/branch/{br.abbr}/info
+
+Use
+  Searches for branch details by branch abbreviation. If branch is found then
+  branch id, branch name, branch abbreviation, and enabled status is returned.
+
+Variables
+    br.abbr:
+           Branch abbreviation
+
+--------------------------------------------------------------------------------
+URL (POST)
+  https://www.example.com/api/v1/index.php?whatitdo=sys/branch
+
+Use
+  Adds a new branch to the database.
+
+POST Variables
+    branchname:
+           [required] Name of new branch
+
+    branchabbr:
+          Abbreviation of new branch
+
+    branchenabled:
+          Whether or not branch should be enabled on creation. Set to 1 to
+          enable branch or 0 to disable. Branches are disabled by default.
+
+Fields returned
+    branches_id:
+          Record ID of new branch.
