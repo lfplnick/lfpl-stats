@@ -100,8 +100,8 @@ class DailyStatistic {
         if ( $goForExecute ) {
             try {
                 $conn->beginTransaction();
-                $result = $statement->execute();
-                if ( $result ) {
+                $success = $statement->execute();
+                if ( $success ) {
                     $return[] = [ 'dst_id' => $conn->lastInsertId() ];
                 } else {
                     $return = false;
