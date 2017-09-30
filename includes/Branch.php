@@ -79,6 +79,14 @@ class Branch {
         return !$this->branchExists;
     }
 
+
+    /**
+     * Adds branch to database if branch does not already exist.
+     *
+     * @return [Branch|bool]
+     *  If branch is successfully created then $this is returned, otherwise
+     *  false is returned and $this->error is set.
+     */
     public function create()
     {
         $searchBranch = ( new Branch )
@@ -86,24 +94,28 @@ class Branch {
             ->search()
         ;
 
+        // likely an internal error, either way don't create the branch
         if( $searchBranch === false )
         {
             $this->error = "Error creating branch.";
             return false;
         }
 
+        // branch exists, don't create the branch
         if( $searchBranch->exists() )
         {
             $this->error = "Branch already exists.";
             return false;
         }
 
+        // branch name is required to create branch
         if( null === $this->branchName )
         {
             $this->error = "Not enough information to create new branch.";
             return false;
         }
 
+        // can't create branch if we can't connect to database
         $conn = Connection::getConnection();
         if( $conn === false )
         {
@@ -147,18 +159,21 @@ class Branch {
                 );
         }
 
+        // values didn't bind correctly
         if( $goForExecute === false )
         {
             $this->error = "Error creating branch.";
             return false;
         }
 
+        // statement failed to execute
         if( $sth->execute() === false )
         {
             $this->error = "Error creating branch.";
             return false;
         }
 
+        // can't verify that branch was created
         $this->search();
         if( $this->branchExists === false )
         {
@@ -180,7 +195,7 @@ class Branch {
      *  search(), one where name is null and the next where abbreviation is
      *  null.
      * @return [Branch|bool]
-     *  If branch is successful then calling Branch object is returned,
+     *  If search is successful then calling Branch object is returned,
      *  otherwise false is returned and $this->error is set.
      *
      *  If branch is found then calling Branch object's id, name,
