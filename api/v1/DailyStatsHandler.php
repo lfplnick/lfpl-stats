@@ -249,14 +249,14 @@ class DailyStatsHandler extends StatsHandler
 
         if( !$this->servicePointEnabled( $sp_id ) ){
             $this->responseCode = 400;
-            $this->response = 'Service point not enabled.';
+            $this->response = 'Service point not enabled or does not exist.';
             $this->sendResponse();
             exit();
         }
 
         if( !$this->dailyStatTypeEnabled( $dst_id ) ){
             $this->responseCode = 400;
-            $this->response = 'Daily stat type not enabled.';
+            $this->response = 'Daily stat type not enabled or does not exist.';
             $this->sendResponse();
             exit();
         }
@@ -336,7 +336,7 @@ SQL;
         }
 
         if( !$goForExecute || !$result ) {
-            $this->responseCode = 500;
+            $this->responseCode = 400;
             $this->response = 'Could not execute query string.';
             $this->sendResponse();
         }
@@ -344,9 +344,8 @@ SQL;
         $records = $statement->fetchAll( PDO::FETCH_ASSOC );
 
         $this->responseCode = 200;
-        header( 'Content-Type: application/json', true, $this->responseCode );
-        echo( json_encode($records) );
-        
+        $this->response = json_encode( $records );
+        $this->sendResponse( 'json' );        
 
     }// end handleGetRequest()
 
@@ -364,7 +363,7 @@ SQL;
             $this->response = json_encode( $result );
         }
 
-        $this->sendResponse();
+        $this->sendResponse( 'json' );
     }
 
     /**
