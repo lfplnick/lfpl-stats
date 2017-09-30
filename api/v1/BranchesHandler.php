@@ -56,8 +56,17 @@ class BranchesHandler extends RequestHandler
             switch ( $nextParam )
             {
                 case 'list':
-                    $this->baseResource = 'branch';
-                    $this->requestGood = self::REQUEST_GOOD;
+                    $nextParam = $this->nextParam();
+                    if( $nextParam === false )
+                    {
+                        $this->baseResource = 'list enabled branches';
+                        $this->requestGood = self::REQUEST_GOOD;
+                    } elseif( strtolower( $nextParam ) === 'all' ) {
+                        $this->baseResource = 'list all branches';
+                        $this->requestGood = self::REQUEST_GOOD;
+                    } else {
+                        $this->requestGood = self::REQUEST_NOGOOD;
+                    }
                     break;
 
                 default:
@@ -87,31 +96,32 @@ class BranchesHandler extends RequestHandler
         if( $this->method === 'get' )
         {
             $nextParam = $this->nextParam();
-            switch( $nextParam )
+            if( false === $nextParam )
             {
-                case false:
-                    $this->requestGood = self::REQUEST_NOGOOD;
-                    break;
+                $this->requestGood = self::REQUEST_NOGOOD;                
+            } else {
+                switch( $nextParam )
+                {
+                    case 'sp': // generate a list of service points for the given branch
+                        $this->baseResource = 'service point';
+                        if( $this->nextParam() === false )
+                        {
+                            $this->requestGood = self::REQUEST_GOOD;
+                        } else {
+                            $this->requestGood = self::REQUEST_NOGOOD;
+                        }
+                        break;
 
-                case 'sp': // generate a list of service points for the given branch
-                    $this->baseResource = 'service point';
-                    if( $this->nextParam() === false )
-                    {
+                    case 'info': // fetch branch info, i.e. id, name, abbr
+                        $this->baseResource = 'branch info';
                         $this->requestGood = self::REQUEST_GOOD;
-                    } else {
+                        break;
+
+                    default:
                         $this->requestGood = self::REQUEST_NOGOOD;
-                    }
-                    break;
-
-                case 'info': // fetch branch info, i.e. id, name, abbr
-                    $this->baseResource = 'branch info';
-                    $this->requestGood = self::REQUEST_GOOD;
-                    break;
-
-                default:
-                    $this->requestGood = self::REQUEST_NOGOOD;
-                    break;
-            }// switch nextParam
+                        break;
+                }// switch nextParam
+            }// nextParam !== false
         }// method === 'get'
         elseif( $this->method === 'post' )
         {
@@ -149,14 +159,27 @@ class BranchesHandler extends RequestHandler
      */
     protected function handleGetRequest()
     {
-        if( $this->baseResource === 'branch' )
+        if( $this->baseResource === 'list enabled branches' 
+            || $this->baseResource === 'list all branches' )
         {
             $this->getConnection();
-            $sql = <<<SQL
-                SELECT `branches_name`, `branches_abbr`
-                FROM `stat_branches`
-                WHERE `branches_enabled` = 1;
+            $select = <<<SQL
+                SELECT
+                    `branches_id`,
+                    `branches_name`,
+                    `branches_abbr`
 SQL;
+
+            $from = 'FROM `stat_branches`';
+            $where = '';
+
+            if( $this->baseResource === 'list enabled branches' )
+            {
+                $where .= 'WHERE `branches_enabled` = 1';
+            } else {
+                $select .= ', branches_enabled';
+            }
+            $sql = $select . ' ' . $from . ' ' . $where . ';';
 
             $statement = $this->conn->prepare( $sql );
             
@@ -172,9 +195,7 @@ SQL;
             $this->responseCode = 200;
             header( 'Content-Type: application/json', true, $this->responseCode );
             echo( json_encode( $branches ) );
-
-
-        }// baseResource === 'branch'
+        }// list branches
         elseif( $this->baseResource === 'service point' )
         {
             $this->getConnection();

@@ -166,7 +166,16 @@ URL (GET)
   https://www.example.com/api/v1/index.php?whatitdo=sys/branch/list
 
 Use
-  Lists all active branches. Info includes branch name and branch abbreviation.
+  Lists all active branches. Info includes branch id, branch name and branch
+  abbreviation.
+
+--------------------------------------------------------------------------------
+URL (GET)
+  https://www.example.com/api/v1/index.php?whatitdo=sys/branch/list/all
+
+Use
+  Lists all branches, including disabled branches. Info includes branch id,
+  branch name, branch abbreviation, and whether branch is enabled or disabled.
 
 --------------------------------------------------------------------------------
 URL (GET)
