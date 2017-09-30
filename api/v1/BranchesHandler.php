@@ -28,6 +28,10 @@ class BranchesHandler extends RequestHandler
                 $this->handleGetRequest();
                 break;
 
+            case 'post':
+                $this->handlePostRequest();
+                break;
+
             default:
                 $this->responseCode = 405;
                 $this->sendResponse();
@@ -41,7 +45,13 @@ class BranchesHandler extends RequestHandler
 
         if( $nextParam === false ) // this needs to be a strict comparison, i.e. not in switch
         {
-            $this->requestGood = self::REQUEST_NOGOOD;            
+            if( $this->method === 'post' )
+            {
+                $this->baseResource = 'create branch';
+                $this->getBranchParameters();
+            } else {
+                $this->requestGood = self::REQUEST_NOGOOD;
+            }
         } else {
             switch ( $nextParam )
             {
@@ -103,6 +113,32 @@ class BranchesHandler extends RequestHandler
                     break;
             }// switch nextParam
         }// method === 'get'
+        elseif( $this->method === 'post' )
+        {
+            if( isset( $_POST['branchname'] ) )
+            {
+                $this->branch = ( new Branch )
+                    ->setName( $_POST['branchname'] )
+                ;
+
+                if( isset( $_POST['branchabbr'] ) )
+                {
+                    $this->branch
+                        ->setAbbr( $_POST['branchabbr'] );
+                }
+
+                if( isset( $_POST['branchenabled'] )
+                    && $_POST['branchenabled'] === '1' )
+                {
+                    $this->branch->setEnabled();
+                } else {
+                    $this->branch->setDisabled();
+                }
+                $this->requestGood = self::REQUEST_GOOD;
+            } else {// no branch name given
+                $this->requestGood = self::REQUEST_NOGOOD;
+            }
+        }
     }// end getBranchParameters
 
 /***********************
@@ -191,4 +227,29 @@ SQL;
             $this->sendResponse();
         }
     }//handleGetRequest
+
+    /**
+     * Handler for POST requests
+     */
+    protected function handlePostRequest()
+    {
+        if( $this->baseResource === 'create branch' )
+        {
+            if( $this->branch->create() !== false )
+            {
+                $this->responseCode = 200;
+                $this->response =
+                    '[{"branches_id":' . $this->branch->getId() . '}]';
+                $this->sendResponse( 'json' );
+            } else {
+                $this->responseCode = 400;
+                $this->response = $this->branch->getErrorMessage();
+                $this->sendResponse();
+            }
+        } else {
+            $this->responseCode = 400;
+            $this->response = "Unknown resource.";
+            $this->sendResponse();
+        }
+    }
 }

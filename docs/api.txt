@@ -148,10 +148,10 @@ Use
 
 POST Variables
     servicepoint:
-           Service point ID
+          [required] Service point ID
 
     dstype:
-          Statistic type ID
+          [required] Statistic type ID
 
 Fields returned
     dst_id:
@@ -193,3 +193,23 @@ Variables
            Branch abbreviation
 
 --------------------------------------------------------------------------------
+URL (POST)
+  https://www.example.com/api/v1/index.php?whatitdo=sys/branch
+
+Use
+  Adds a new branch to the database.
+
+POST Variables
+    branchname:
+           [required] Name of new branch
+
+    branchabbr:
+          Abbreviation of new branch
+
+    branchenabled:
+          Whether or not branch should be enabled on creation. Set to 1 to
+          enable branch or 0 to disable. Branches are disabled by default.
+
+Fields returned
+    branches_id:
+          Record ID of new branch.
