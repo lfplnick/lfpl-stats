@@ -1,8 +1,8 @@
 <?php 
+    include 'includes/AutoLoader.php';
+
     $pageTitle = "Stat Tracker";
- 
     include 'components/head.php';
-    include 'mock-data.php';
 ?>
       <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     </head>
@@ -13,22 +13,27 @@
     <!-- Main jumbotron for a primary marketing message or call to action -->
       <div class="jumbotron">
         <div class="container">
-          <h1 class="text-center" style="border-bottom: #000 3pt solid" ng-model="appName"></h1>
+          <h1 class="text-center" style="border-bottom: #000 3pt solid" ng-model="appName">{{appName}}</h1>
           <h2 class="text-center">
 
 
-
-<span id="desk" ng-hide="editSettings">{{currentDesk.name}}</span>
-<span id="desk-selector" ng-show="editSettings" class="form-inline form-group-lg">
-  <select class="form-control" ng-model="currentDesk" ng-options="desk.name for desk in desks"></select>
-</span>
-
-
-
+          <!-- Branch setting -->
+          <span id="branch" ng-hide="editSettings">{{currentBranch.branches_name}}</span>
+          <span id="branch-selector" ng-show="editSettings" class="form-inline form-group-lg">
+            <select class="form-control" ng-model="currentBranch" ng-change="getDesks(currentBranch)" ng-options="branch.branches_name for branch in branches"></select>
+          </span>
+          
             <span class="hidden-xs"> | </span>
-            <span id="branch" ng-model="branch"></span>
-            <span id="open-settings" class="glyphicon glyphicon-cog btn" style="font-size: 0.7em; padding-left: 10px;" aria-hidden="true" ng-click="editSettings = !editSettings"></span>
-            <div id="settings-buttons" class="btn-group hidden">
+
+          <!-- Desk setting -->
+          <span id="desk" ng-hide="editSettings">{{currentDesk.sp_name}}</span>
+          <span id="desk-selector" ng-show="editSettings" class="form-inline form-group-lg">
+            <select class="form-control" ng-model="currentDesk" ng-options="desk.sp_name for desk in desks"></select>
+          </span>
+
+          <!-- Settings button -->
+            <span id="open-settings" ng-hide="editSettings" class="glyphicon glyphicon-cog btn" style="font-size: 0.7em; padding-left: 10px;" aria-hidden="true" ng-click="editSettings = !editSettings"></span>
+            <div id="settings-buttons" ng-show="editSettings" class="btn-group">
               <button type="button" id="save-settings" class="btn btn-primary btn-lg" onclick="nothing()">Save</button>
               <button type="button" id="cancel-settings" class="btn btn-default btn-lg" onclick="cancelSettings()">Cancel</button>
             </div>
