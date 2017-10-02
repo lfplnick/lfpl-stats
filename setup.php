@@ -2,8 +2,32 @@
 
 include 'includes/InitializeDatabase.php';
 
-// This data will eventually be supplied by the user at runtime.
-include 'setupdata.php';
+// This info will eventually be supplied by the user at runtime.
+
+// Administrative user for MySQL. Must be able to create new users and
+//  databases.
+$sgDbAdminUser  = "admin";
+
+// Password for administrative MySQL user
+$sgDbAdminPw    = "supersecret";
+
+// MySQL server hostname or IP
+$sgHost         = "localhost";
+
+// MySQL port number
+$sgPort         = 3306;
+
+// Database name
+$sgDbName       = "lfplstats";
+
+// Database user for working with stats. User will be created during setup.
+$sgDbStatsUser  = "statsuser";
+
+// Password for new stats database user.
+$sgDbStatsPw    = "secret";
+
+
+
 
 
 echo "Hi there! Let's get you set up.<br>";
