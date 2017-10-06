@@ -2,6 +2,17 @@
 
 angular.module('stat3k', ['ngCookies'])
 
+/** 
+ * TODO Handle disabled service points and branches
+ * 
+ * If service point is disabled it should not be displayed on
+ * a branch's Select Desk list.
+ *
+ * If branch is disabled it should not be displayed on the Select Branch list.
+ *
+ * Stats should not be allowed to be submitted at a disabled branch (this may
+ * need to be handled in the api).
+ */
 .controller('mainCtrl', function ($cookies, $scope, dataService){
   $scope.loadSettings = function()
   {
@@ -228,6 +239,43 @@ angular.module('stat3k', ['ngCookies'])
     return false;
   }
   
+  //TODO Handle branch deleted
+  $scope.submitStat = function( dstype )
+  {
+    dataService.postStat(
+      $scope.currentDesk.sp_id,
+      dstype,
+      function( response )
+      {
+        //TODO this needs to handle both successful and failed posts
+        console.log( 'stat submitted...' );
+        console.log( response[0].dst_id );
+      },
+      function( response )
+      {
+        console.log( 'submit failed!!!' );
+        dataService.getDesks(
+          $scope.currentBranch.branches_id,
+          function( response )
+          {
+            $scope.desks = response.data;
+            $scope.validateCurrentDesk();
+            if( -1 === $scope.currentDesk.sp_id )
+            {
+              $scope.desks.unshift(
+                {
+                  "sp_id": -1,
+                  "sp_name": "-- Select Desk --",
+                  "desks_type": ""
+                }
+              );
+              $scope.openSettings();
+            }// desk cleared
+          }// end getDesks callback
+        );// dataService.getDesks call
+      }// failed POST request
+    )// end dataService.postStat call
+  }// submitStat
 
 
   $scope.appName = "Stat Cracker 3000";
@@ -244,6 +292,7 @@ angular.module('stat3k', ['ngCookies'])
     $scope.editSettings = false;
   }
 
+  //TODO Fix this so settings appear if branch is deleted
   dataService.getBranches(
     function( response )
     {
@@ -309,6 +358,26 @@ angular.module('stat3k', ['ngCookies'])
       ).then(cb);     
     }
   };
+
+  this.postStat = function( deskId, dstype, cb_good, cb_bad )
+  {
+    if( deskId != -1 )
+    {
+      var postData = {
+        "servicepoint": deskId,
+        "dstype": dstype
+      };
+      $http(
+        {
+          method: 'POST',
+          url: 'api/v1/index.php?whatitdo=stats/ds/stat/new',
+          data: $.param( postData ),
+          headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+        }
+      ).success( cb_good )
+      .error( cb_bad );
+    }
+  }
 
 })//service: dataService
 

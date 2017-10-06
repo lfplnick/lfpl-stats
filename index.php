@@ -71,15 +71,15 @@
           </div>
 
           <!-- Easy -->
-          <div class="col-xs-4 col-md-3 btn btn-default stat-button" ng-disabled="editSettings" ng-click="nothing()">
+          <div class="col-xs-4 col-md-3 btn btn-default stat-button" ng-disabled="editSettings" ng-click="submitStat(4)">
             <h3>Easy<span class="hidden-xs"><br/>( &lt; 2 minutes )</span></h3>
           </div>
           <!-- Medium -->
-          <div class="col-xs-4 col-md-3 btn btn-default stat-button" ng-disabled="editSettings" ng-click="nothing()">
+          <div class="col-xs-4 col-md-3 btn btn-default stat-button" ng-disabled="editSettings" ng-click="submitStat(5)">
             <h3>Medium<span class="hidden-xs"><br/>( 2 - 10 minutes )</span></h3>
           </div>
           <!-- Hard -->
-          <div class="col-xs-4 col-md-3 btn btn-default stat-button" ng-disabled="editSettings" ng-click="nothing()">
+          <div class="col-xs-4 col-md-3 btn btn-default stat-button" ng-disabled="editSettings" ng-click="submitStat(6)">
             <h3>Hard<span class="hidden-xs"><br/>( &gt; 10 minutes )</span></h3>
           </div>
 
@@ -95,15 +95,15 @@
           </div>
 
           <!-- Easy -->
-          <div class="col-xs-4 col-md-3 btn btn-default stat-button" ng-disabled="editSettings" ng-click="nothing()">
+          <div class="col-xs-4 col-md-3 btn btn-default stat-button" ng-disabled="editSettings" ng-click="submitStat(1)">
             <h3>Easy<span class="hidden-xs"><br/>( &lt; 2 minutes )</span></h3>
           </div>
           <!-- Medium -->
-          <div class="col-xs-4 col-md-3 btn btn-default stat-button" ng-disabled="editSettings" ng-click="nothing()">
+          <div class="col-xs-4 col-md-3 btn btn-default stat-button" ng-disabled="editSettings" ng-click="submitStat(2)">
             <h3>Medium<span class="hidden-xs"><br/>( 2 - 10 minutes )</span></h3>
           </div>
           <!-- Hard -->
-          <div class="col-xs-4 col-md-3 btn btn-default stat-button" ng-disabled="editSettings" ng-click="nothing()">
+          <div class="col-xs-4 col-md-3 btn btn-default stat-button" ng-disabled="editSettings" ng-click="submitStat(3)">
             <h3>Hard<span class="hidden-xs"><br/>( &gt; 10 minutes )</span></h3>
           </div>
 
