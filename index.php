@@ -20,7 +20,7 @@
           <!-- Branch setting -->
           <span id="branch" ng-hide="editSettings">{{currentBranch.branches_name}}</span>
           <span id="branch-selector" ng-show="editSettings" class="form-inline form-group-lg">
-            <select class="form-control" ng-model="currentBranch" ng-change="getDesks(currentBranch)" ng-options="branch.branches_name for branch in branches"></select>
+            <select class="form-control" ng-model="selectBranchId" ng-change="getDesks(selectBranchId)" ng-options="branch.branches_id as branch.branches_name for branch in branches"></select>
           </span>
           
             <span class="hidden-xs"> | </span>
@@ -28,14 +28,14 @@
           <!-- Desk setting -->
           <span id="desk" ng-hide="editSettings">{{currentDesk.sp_name}}</span>
           <span id="desk-selector" ng-show="editSettings" class="form-inline form-group-lg">
-            <select class="form-control" ng-model="currentDesk" ng-options="desk.sp_name for desk in desks"></select>
+            <select class="form-control" ng-model="selectDeskId" ng-options="desk.sp_id as desk.sp_name for desk in desks"></select>
           </span>
 
           <!-- Settings button -->
-            <span id="open-settings" ng-hide="editSettings" class="glyphicon glyphicon-cog btn" style="font-size: 0.7em; padding-left: 10px;" aria-hidden="true" ng-click="editSettings = !editSettings"></span>
+            <span id="open-settings" ng-hide="editSettings" class="glyphicon glyphicon-cog btn" style="font-size: 0.7em; padding-left: 10px;" aria-hidden="true" ng-click="openSettings()"></span>
             <div id="settings-buttons" ng-show="editSettings" class="btn-group">
-              <button type="button" id="save-settings" class="btn btn-primary btn-lg" onclick="nothing()">Save</button>
-              <button type="button" id="cancel-settings" class="btn btn-default btn-lg" onclick="cancelSettings()">Cancel</button>
+              <button type="button" id="save-settings" class="btn btn-primary btn-lg" ng-click="saveSettings()">Save</button>
+              <button type="button" id="cancel-settings" class="btn btn-default btn-lg" ng-click="cancelSettings()">Cancel</button>
             </div>
           </h2>
   <!-- Debugging screen sizes
@@ -48,7 +48,11 @@
       </div>
 
       <div class="container"> <!-- Main container -->
-        <p>{{currentDesk}}</p>
+        <p>currentBranch: {{currentBranch}}</p>
+        <p>currentDesk: {{currentDesk}}</p>
+        <p>selectBranch: {{selectBranchId}}</p>
+        <p>selectDesk: {{selectDeskId}}</p>
+        <p>editSettings: {{editSettings}}</p>
         <div class="row" style="padding-bottom: 10px;">
 
           <!-- Informational question buttons -->

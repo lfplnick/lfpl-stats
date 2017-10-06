@@ -3,69 +3,37 @@
 angular.module('stat3k', ['ngCookies'])
 
 .controller('mainCtrl', function ($cookies, $scope, dataService){
-
-  var allCookies = $cookies.getAll();
-  console.log( "Cookies:" );
-  console.log( allCookies );
-  console.log( "===========================" );
-
-  $scope.branch = "Crescent Hill";
-  $scope.appName = "Stat Cracker 3000";
-  $scope.currentBranch =
+  $scope.loadSettings = function()
   {
-    "branches_name": "Crescent Hill",
-    "branches_id": "4"
+    var branch = $cookies.getObject( "branch" );
+    var desk = $cookies.getObject( "desk" );
+
+    if( typeof branch !== 'undefined' )
+    {
+      $scope.currentBranch = branch;
+    } else {
+      $scope.clearCurrentBranch();
+    }
+    
+    if( typeof desk !== 'undefined' )
+    {
+      $scope.currentDesk = desk;
+    } else {
+      $scope.clearCurrentDesk();
+    }
   }
 
-  dataService.getBranches(
-    function( response )
-    {
-      console.log( response.data );
-      $scope.branches = response.data;
-      $scope.branches.sort(
-        function( a, b )
-        {
-          var branchA = a.branches_name.toUpperCase();
-          var branchB = b.branches_name.toUpperCase();
-
-          if( branchA < branchB){ return -1; }
-          if( branchA > branchB){ return 1; }
-          return 0;
-        }
-      );
-      $scope.currentBranch = $scope.getCurrentBranch();
-    }
-  );
-  console.log( "Current branch:" );
-  console.log( $scope.currentBranch );
-  console.log( "=============================" );
-
-
-  $scope.getDesks = function( branch )
+  $scope.getDesks = function( branchId )
   {
     dataService.getDesks(
-      branch,
+      branchId,
       function(response)
       {
-        console.log(response.data);
         $scope.desks = response.data;
-        $scope.desks.sort(
-          function( a, b )
-          {
-            var deskA = a.sp_name.toUpperCase();
-            var deskB = b.sp_name.toUpperCase();
-  
-            if( deskA < deskB){ return -1; }
-            if( deskA > deskB){ return 1; }
-            return 0;
-          }
-        );
-        $scope.currentDesk = $scope.getCurrentDesk();
       }
     );
   };
-  $scope.getDesks( $scope.currentBranch );
-  
+
   $scope.helloWorld = function(){
     console.log("Hello there!");
   };
@@ -78,51 +46,81 @@ angular.module('stat3k', ['ngCookies'])
     console.log($this.desk.name);
   };
 
-  $scope.getCurrentBranch = function()
+  $scope.validateCurrentBranch = function()
   {
-    var cookieBranch = $cookies.get("branch");
-    console.log("cookieBranch: ");
-    console.log(cookieBranch);
-    console.log("cookieBranch.name: " + cookieBranch.name);
-    console.log();
-
-    var currentBranch;
+    if( $scope.currentBranch.id === '' )
+    {
+      $scope.clearCurrentDesk();
+      return false;
+    }
 
     for( var i = 0; i < $scope.branches.length; i++ )
     {
-      if( cookieBranch.id === $scope.branches[i].id
-        && cookieBranch.name === $scope.branches[i].name)
+      if( $scope.currentBranch.branches_id === $scope.branches[i].branches_id
+        && $scope.currentBranch.branches_name === $scope.branches[i].branches_name)
       {
-        console.log(
-          cookieBranch.name + " == "
-          + $scope.branches[i].name + ": "
-          + (cookieBranch.id === $scope.branches[i].id)
-        );
-        currentBranch = $scope.branches[i];
+        return true;
       }
+    }// for branches
+
+    $scope.clearCurrentBranch();
+    $scope.clearCurrentDesk();
+    return false;
+  };//validateCurrentBranch
+
+
+  /**
+   * Validates current desk against database. Should be used as a callback to
+   * dataService.getDesks().
+   */
+  $scope.validateCurrentDesk = function()
+  {
+    if(
+      ( $scope.currentDesk.sp_id === '' )
+      || ( $scope.currentBranch.branches_id === '' )
+    ){
+      $scope.clearCurrentBranch();
+      $scope.clearCurrentDesk();
+      return false;
     }
 
-    return currentBranch;
-  };//getCurrentBranch
+    for( var i = 0; i < $scope.desks.length; i++ )
+    {
+      if(
+        $scope.currentDesk.sp_id === $scope.desks[i].sp_id
+        && $scope.currentDesk.sp_name === $scope.desks[i].sp_name
+      ){
+        return true;
+      }
+    }// for desks
+
+    $scope.clearCurrentDesk();
+    return false;
+  }
+
+  $scope.clearCurrentBranch = function()
+  {
+    $scope.currentBranch.branches_id = '';
+    $scope.currentBranch.branches_name = '';
+    $scope.currentBranch.branches_abbr = '';
+    $scope.clearCurrentDesk();
+  }
+
+  $scope.clearCurrentDesk = function()
+  {
+    $scope.currentDesk.sp_id = '';
+    $scope.currentDesk.sp_name = '';
+    $scope.currentDesk.desks_type = '';
+  }
 
   $scope.getCurrentDesk = function(){
     var cookieDesk = $cookies.getObject("desk");
-    console.log("cookieDesk: ");
-    console.log(cookieDesk);
-    console.log("cookieDesk.name: " + cookieDesk.name);
-    console.log();
-
     var currentDesk;
 
     for (var i = 0; i < $scope.desks.length; i++) {
       if (cookieDesk.id === $scope.desks[i].id
         && cookieDesk.name === $scope.desks[i].name)
       {
-        console.log(
-          cookieDesk.name + " == "
-          + $scope.desks[i].name + ": "
-          + (cookieDesk.id === $scope.desks[i].id)
-        );
         currentDesk = $scope.desks[i];
       }
     }
@@ -143,27 +141,103 @@ angular.module('stat3k', ['ngCookies'])
 //    return currentDesk;
   };//getCurrentDesk
 
+  $scope.openSettings = function()
+  {
+    $scope.selectBranchId = $scope.currentBranch.branches_id;
+    $scope.selectDeskId = $scope.currentDesk.sp_id;
+    $scope.editSettings = true;
+  };
+
+  $scope.cancelSettings = function()
+  {
+    $scope.editSettings = false;
+    $scope.selectBranchId = $scope.currentBranch.branches_id;
+    $scope.selectDeskId = $scope.currentDesk.sp_id;
+    $scope.getDesks( $scope.currentBranch.branches_id );
+  };// cancelSettings
+
+  $scope.saveSettings = function()
+  {
+    $scope.currentBranch = $scope.searchBranchIds( $scope.selectBranchId );
+    $scope.currentDesk = $scope.searchDeskIds( $scope.selectDeskId );
+
+    $cookies.putObject( "branch", $scope.currentBranch );
+    $cookies.putObject( "desk", $scope.currentDesk );
+    $scope.editSettings = false;
+  };// saveSettings
+
+  $scope.searchBranchIds = function( id )
+  {
+    for (var i = 0; i < $scope.branches.length; i++) {
+      if( $scope.branches[i].branches_id === id ){
+        return $scope.branches[i];
+      }
+    }
+
+    return false;
+  }
+
+  $scope.searchDeskIds = function( id )
+  {
+    for (var i = 0; i < $scope.desks.length; i++) {
+      if( $scope.desks[i].sp_id === id ){
+        return $scope.desks[i];
+      }
+    }
+
+    return false;
+  }
+  
 
 
+  $scope.appName = "Stat Cracker 3000";
 
-//  $scope.cookies = $cookies.get("desk");
-//  console.log("Before cookies");
-//  console.log($scope.cookies);
-//
-  $cookies.putObject("desk", {"id":1, "name": "Circulation Desk"});
-//  $scope.cookies = $cookies.get("desk");
-//  console.log("After cookies");
-//  console.log($scope.cookies);
+  $scope.loadSettings();
+  if( $scope.currentBranch.branches_id === '' || $scope.currentDesk.sp_id === '' )
+  {
+    $scope.editSettings = true;
+  } else {
+    $scope.editSettings = false;
+  }
 
+  dataService.getBranches(
+    function( response )
+    {
+      $scope.branches = response.data;
+      if( $scope.currentBranch.branches_id !== '' )
+      {
+        if( $scope.validateCurrentBranch() === true )
+        {
+          dataService.getDesks(
+            $scope.currentBranch.branches_id,
+            function( response )
+            {
+              $scope.desks = response.data;
+              if( $scope.currentDesk.sp_id !== '' )
+              {
+                $scope.validateCurrentDesk();
+              }
+            }// getDesks cb
+          )// getDesks
+
+          if( $scope.currentBranch.branches_id === '' || $scope.currentDesk.sp_id === '' )
+          {
+            $scope.editSettings = true;
+          }
+    
+        }// current branch valid
+      }
+    }
+  );
 
 })//controller: mainCtrl
 
 .service('dataService', function( $http )
 {
-  this.getCurrentDesk = function() {
-    console.log("getting current desk...");
-    return $scope.desks[1];
-  };
+  // this.getCurrentDesk = function() {
+  //   console.log("getting current desk...");
+  //   return $scope.desks[1];
+  // };
 
   this.getBranches = function( cb ){
     $http.get(
@@ -171,12 +245,12 @@ angular.module('stat3k', ['ngCookies'])
     ).then( cb );
   };
 
-  this.getDesks = function(branch, cb){
-    if( branch != '' )
+  this.getDesks = function(branchId, cb){
+    if( branchId != '' )
     {
       $http.get(
         'api/v1/index.php?whatitdo=sys/branch/'
-        + branch.branches_id
+        + branchId
         + '/sp'
       ).then(cb);     
     }
