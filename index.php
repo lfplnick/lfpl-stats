@@ -20,7 +20,12 @@
           <!-- Branch setting -->
           <span id="branch" ng-hide="editSettings">{{currentBranch.branches_name}}</span>
           <span id="branch-selector" ng-show="editSettings" class="form-inline form-group-lg">
-            <select class="form-control" ng-model="selectBranchId" ng-change="getDesks(selectBranchId)" ng-options="branch.branches_id as branch.branches_name for branch in branches"></select>
+            <select
+              class="form-control"
+              ng-model="selectBranchId"
+              ng-change="changeBranch()"
+              ng-options="branch.branches_id as branch.branches_name for branch in branches">
+            </select>
           </span>
           
             <span class="hidden-xs"> | </span>
@@ -28,14 +33,19 @@
           <!-- Desk setting -->
           <span id="desk" ng-hide="editSettings">{{currentDesk.sp_name}}</span>
           <span id="desk-selector" ng-show="editSettings" class="form-inline form-group-lg">
-            <select class="form-control" ng-model="selectDeskId" ng-options="desk.sp_id as desk.sp_name for desk in desks"></select>
+            <select
+              class="form-control"
+              ng-init="selectDeskId = -1"
+              ng-model="selectDeskId"
+              ng-options="desk.sp_id as desk.sp_name for desk in desks">
+            </select>
           </span>
 
           <!-- Settings button -->
             <span id="open-settings" ng-hide="editSettings" class="glyphicon glyphicon-cog btn" style="font-size: 0.7em; padding-left: 10px;" aria-hidden="true" ng-click="openSettings()"></span>
             <div id="settings-buttons" ng-show="editSettings" class="btn-group">
-              <button type="button" id="save-settings" class="btn btn-primary btn-lg" ng-click="saveSettings()">Save</button>
-              <button type="button" id="cancel-settings" class="btn btn-default btn-lg" ng-click="cancelSettings()">Cancel</button>
+              <button type="button" id="save-settings" class="btn btn-primary btn-lg" ng-disabled="!newSettingsValid()" ng-click="saveSettings()">Save</button>
+              <button type="button" id="cancel-settings" class="btn btn-default btn-lg" ng-disabled="!currentSettingsValid()" ng-click="cancelSettings()">Cancel</button>
             </div>
           </h2>
   <!-- Debugging screen sizes
@@ -61,15 +71,15 @@
           </div>
 
           <!-- Easy -->
-          <div class="col-xs-4 col-md-3 btn btn-default stat-button" ng-click="nothing()">
+          <div class="col-xs-4 col-md-3 btn btn-default stat-button" ng-disabled="editSettings" ng-click="nothing()">
             <h3>Easy<span class="hidden-xs"><br/>( &lt; 2 minutes )</span></h3>
           </div>
           <!-- Medium -->
-          <div class="col-xs-4 col-md-3 btn btn-default stat-button" ng-click="nothing()">
+          <div class="col-xs-4 col-md-3 btn btn-default stat-button" ng-disabled="editSettings" ng-click="nothing()">
             <h3>Medium<span class="hidden-xs"><br/>( 2 - 10 minutes )</span></h3>
           </div>
           <!-- Hard -->
-          <div class="col-xs-4 col-md-3 btn btn-default stat-button" ng-click="nothing()">
+          <div class="col-xs-4 col-md-3 btn btn-default stat-button" ng-disabled="editSettings" ng-click="nothing()">
             <h3>Hard<span class="hidden-xs"><br/>( &gt; 10 minutes )</span></h3>
           </div>
 
@@ -85,15 +95,15 @@
           </div>
 
           <!-- Easy -->
-          <div class="col-xs-4 col-md-3 btn btn-default stat-button" ng-click="nothing()">
+          <div class="col-xs-4 col-md-3 btn btn-default stat-button" ng-disabled="editSettings" ng-click="nothing()">
             <h3>Easy<span class="hidden-xs"><br/>( &lt; 2 minutes )</span></h3>
           </div>
           <!-- Medium -->
-          <div class="col-xs-4 col-md-3 btn btn-default stat-button" ng-click="nothing()">
+          <div class="col-xs-4 col-md-3 btn btn-default stat-button" ng-disabled="editSettings" ng-click="nothing()">
             <h3>Medium<span class="hidden-xs"><br/>( 2 - 10 minutes )</span></h3>
           </div>
           <!-- Hard -->
-          <div class="col-xs-4 col-md-3 btn btn-default stat-button" ng-click="nothing()">
+          <div class="col-xs-4 col-md-3 btn btn-default stat-button" ng-disabled="editSettings" ng-click="nothing()">
             <h3>Hard<span class="hidden-xs"><br/>( &gt; 10 minutes )</span></h3>
           </div>
 

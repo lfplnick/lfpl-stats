@@ -25,13 +25,32 @@ angular.module('stat3k', ['ngCookies'])
 
   $scope.getDesks = function( branchId )
   {
-    dataService.getDesks(
-      branchId,
-      function(response)
-      {
-        $scope.desks = response.data;
-      }
-    );
+    if( -1 === branchId )
+    {
+      $scope.desks = {};
+      $scope.selectDeskId = -1;
+    } else {
+      dataService.getDesks(
+        branchId,
+        function(response)
+        {
+          console.log( response );
+          $scope.desks = response.data;
+          if(
+            $scope.selectBranchId !== -1
+            && $scope.selectDeskId === -1
+          ){
+            $scope.desks.unshift(
+              {
+                "sp_id": -1,
+                "sp_name": "-- Select Desk --",
+                "desks_type": ""
+              }
+            );
+          }
+        }
+      );
+    }
   };
 
   $scope.helloWorld = function(){
@@ -46,9 +65,16 @@ angular.module('stat3k', ['ngCookies'])
     console.log($this.desk.name);
   };
 
+  $scope.changeBranch = function()
+  {
+    console.log( "changing branch...");
+    $scope.selectDeskId = -1;
+    $scope.getDesks( $scope.selectBranchId );
+  };
+
   $scope.validateCurrentBranch = function()
   {
-    if( $scope.currentBranch.id === '' )
+    if( $scope.currentBranch.branches_id === -1 )
     {
       $scope.clearCurrentDesk();
       return false;
@@ -76,10 +102,9 @@ angular.module('stat3k', ['ngCookies'])
   $scope.validateCurrentDesk = function()
   {
     if(
-      ( $scope.currentDesk.sp_id === '' )
-      || ( $scope.currentBranch.branches_id === '' )
+      ( $scope.currentDesk.sp_id === -1 )
+      || ( $scope.currentBranch.branches_id === -1 )
     ){
-      $scope.clearCurrentBranch();
       $scope.clearCurrentDesk();
       return false;
     }
@@ -100,7 +125,8 @@ angular.module('stat3k', ['ngCookies'])
 
   $scope.clearCurrentBranch = function()
   {
-    $scope.currentBranch.branches_id = '';
+    $scope.currentBranch = {};
+    $scope.currentBranch.branches_id = -1;
     $scope.currentBranch.branches_name = '';
     $scope.currentBranch.branches_abbr = '';
     $scope.clearCurrentDesk();
@@ -108,7 +134,8 @@ angular.module('stat3k', ['ngCookies'])
 
   $scope.clearCurrentDesk = function()
   {
-    $scope.currentDesk.sp_id = '';
+    $scope.currentDesk = {};
+    $scope.currentDesk.sp_id = -1;
     $scope.currentDesk.sp_name = '';
     $scope.currentDesk.desks_type = '';
   }
@@ -126,19 +153,6 @@ angular.module('stat3k', ['ngCookies'])
     }
 
     return currentDesk;
-
-//    var currentDesk;
-//    var cookieDesk = $cookies.get("desk");
-//console.log("cookieDesk" + cookieDesk);
-//    console.log($scope.desks);
-//    for ( var i = 0; i < $scope.desks.length; i++ ) {
-//      if (cookieDesk.id == $scope.desks[i].id){
-//        console.log("current desk set to: " + $scope.desks[i].name);
-//        currentDesk = $scope.desks[i];
-//        break;
-//      }
-//    }
-//    return currentDesk;
   };//getCurrentDesk
 
   $scope.openSettings = function()
@@ -164,7 +178,33 @@ angular.module('stat3k', ['ngCookies'])
     $cookies.putObject( "branch", $scope.currentBranch );
     $cookies.putObject( "desk", $scope.currentDesk );
     $scope.editSettings = false;
+
+    if(
+      -1 === $scope.branches[0].branches_id
+      && -1 !== $scope.selectBranchId
+    )
+    {
+      $scope.branches.shift();
+    }
+
+    if(
+      -1 === $scope.desks[0].sp_id
+      && -1 !== $scope.selectDeskId
+    )
+    {
+      $scope.desks.shift();
+    }
   };// saveSettings
+
+  $scope.newSettingsValid = function()
+  {
+    return ( -1 !== $scope.selectBranchId ) && ( -1 !== $scope.selectDeskId );
+  }// settingsValid
+
+  $scope.currentSettingsValid = function()
+  {
+    return ( -1 !== $scope.currentBranch.branches_id ) && ( -1 !== $scope.currentDesk.sp_id );
+  }
 
   $scope.searchBranchIds = function( id )
   {
@@ -191,10 +231,14 @@ angular.module('stat3k', ['ngCookies'])
 
 
   $scope.appName = "Stat Cracker 3000";
+  $scope.currentBranch = {};
+  $scope.currentDesk = {};
 
   $scope.loadSettings();
-  if( $scope.currentBranch.branches_id === '' || $scope.currentDesk.sp_id === '' )
-  {
+  if(
+    -1 === $scope.currentBranch.branches_id
+    || -1 === $scope.currentDesk.sp_id
+  ){
     $scope.editSettings = true;
   } else {
     $scope.editSettings = false;
@@ -204,7 +248,7 @@ angular.module('stat3k', ['ngCookies'])
     function( response )
     {
       $scope.branches = response.data;
-      if( $scope.currentBranch.branches_id !== '' )
+      if( $scope.currentBranch.branches_id !== -1 )
       {
         if( $scope.validateCurrentBranch() === true )
         {
@@ -213,19 +257,29 @@ angular.module('stat3k', ['ngCookies'])
             function( response )
             {
               $scope.desks = response.data;
-              if( $scope.currentDesk.sp_id !== '' )
+              if( false === $scope.validateCurrentDesk() )
               {
-                $scope.validateCurrentDesk();
+                $scope.desks.unshift(
+                  {
+                    "sp_id": -1,
+                    "sp_name": "-- Select Desk --",
+                    "desks_type": ""
+                  }
+                );
+                $scope.openSettings();
               }
             }// getDesks cb
           )// getDesks
-
-          if( $scope.currentBranch.branches_id === '' || $scope.currentDesk.sp_id === '' )
-          {
-            $scope.editSettings = true;
-          }
-    
         }// current branch valid
+      } else {
+        $scope.branches.unshift(
+          {
+            "branches_id": -1,
+            "branches_name": "-- Select Branch --",
+            "branches_abbr": ""
+          }
+        );
+        $scope.openSettings();
       }
     }
   );
@@ -246,7 +300,7 @@ angular.module('stat3k', ['ngCookies'])
   };
 
   this.getDesks = function(branchId, cb){
-    if( branchId != '' )
+    if( branchId != -1 )
     {
       $http.get(
         'api/v1/index.php?whatitdo=sys/branch/'
