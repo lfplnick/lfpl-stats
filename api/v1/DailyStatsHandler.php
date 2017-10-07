@@ -132,7 +132,7 @@ class DailyStatsHandler extends StatsHandler
 
         // next param should be branch abbreviation, stop parsing if it isn't
         $this->branchAbbr = $this->nextParam();
-        if( !$this->branchAbbr ){
+        if( false === $this->branchAbbr ){
             $this->requestGood = self::REQUEST_NOGOOD;
             return;
         }
