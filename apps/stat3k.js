@@ -188,7 +188,13 @@ angular.module('stat3k', ['ngCookies'])
 
     $cookies.putObject( "branch", $scope.currentBranch );
     $cookies.putObject( "desk", $scope.currentDesk );
+
     $scope.editSettings = false;
+
+    dataService.getHourlyStats(
+      $scope.currentBranch.branches_abbr,
+      $scope.updateHourlyStats
+    );
 
     if(
       -1 === $scope.branches[0].branches_id
@@ -210,7 +216,7 @@ angular.module('stat3k', ['ngCookies'])
   $scope.newSettingsValid = function()
   {
     return ( -1 !== $scope.selectBranchId ) && ( -1 !== $scope.selectDeskId );
-  }// settingsValid
+  }// newSettingsValid
 
   $scope.currentSettingsValid = function()
   {
@@ -238,6 +244,133 @@ angular.module('stat3k', ['ngCookies'])
 
     return false;
   }
+
+  $scope.updateHourlyStats = function( response )
+  {
+    var hourlyStats = [];
+    var statData = response.data;
+    var maxHour = 0;
+    var minHour = 24;
+
+    statData.forEach(function( statCount ) {
+      var hour = parseInt( statCount.hour );
+      var dstype = statCount.dst_name.toLowerCase();
+      var count = parseInt( statCount.count );
+      var index = hourlyStats.findIndex( x => x.hour === hour )
+
+      if( hour > maxHour )
+        maxHour = hour;
+
+      if( hour < minHour )
+        minHour = hour;
+
+      if( -1 === index )
+      {
+        index = hourlyStats.push( {
+          hour: hour,
+          info: 0,
+          dir: 0
+        } ) - 1;
+      }
+
+      if( -1 < dstype.search( 'info' ) )
+      {
+        hourlyStats[index].info += count;
+      } else if( -1 < dstype.search( 'dir' ) ) {
+        hourlyStats[index].dir += count;
+      }
+
+    });
+
+
+    if( minHour < $scope.chartOptions.hAxis.viewWindow.min[0] )
+      $scope.chartOptions.hAxis.viewWindow.min[0] = minHour;
+
+    if( maxHour > $scope.chartOptions.hAxis.viewWindow.max[0] )
+      $scope.chartOptions.hAxis.viewWindow.max[0] = maxHour;
+
+    $scope.chartData.removeRows( 0, $scope.chartData.getNumberOfRows() );
+    for (var i = 0; i < hourlyStats.length; i++) {
+      var hour = hourlyStats[i].hour;
+      var info = hourlyStats[i].info;
+      var dir = hourlyStats[i].dir;
+
+      $scope.chartData.addRow(
+        [ {v: [hour, 0, 0], f: hour + " o'clock"}, dir, info ]
+      );
+    }
+
+    updateChart();
+    console.log( $scope.chartData );
+  }
+
+  function initChart()
+  {
+    $scope.chartData = new google.visualization.DataTable();
+    $scope.chartData.addColumn('timeofday', 'Time of Day');
+    $scope.chartData.addColumn('number', 'Directional');
+    $scope.chartData.addColumn('number', 'Info');
+
+    $scope.chartOptions = {
+      title: 'Stats Today',
+      colors: ['#A178E8', '#7DD3F2'],
+      isStacked: true,
+      height: 300,
+      hAxis: {
+        title: 'Time of Day',
+        format: 'h:mm a',
+        viewWindow: {
+          min: [8, 0, 0],
+          max: [17,0,0]
+        }
+      },
+      vAxis: {
+        title: 'Questions'
+      }
+    };
+
+    dataService.getHourlyStats(
+      $scope.currentBranch.branches_abbr,
+      $scope.updateHourlyStats
+    );
+  }
+
+  function updateChart() {
+    var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+    chart.draw($scope.chartData, $scope.chartOptions);
+  }
+
+  var cbStatSubmitSuccessful = function( response )
+  {
+    dataService.getHourlyStats(
+      $scope.currentBranch.branches_abbr,
+      $scope.updateHourlyStats
+    );
+  };
+
+  var cbStatSubmitFail = function( response )
+  {
+    console.log( 'submit failed!!!' );
+    dataService.getDesks(
+      $scope.currentBranch.branches_id,
+      function( response )
+      {
+        $scope.desks = response.data;
+        $scope.validateCurrentDesk();
+        if( -1 === $scope.currentDesk.sp_id )
+        {
+          $scope.desks.unshift(
+            {
+              "sp_id": -1,
+              "sp_name": "-- Select Desk --",
+              "desks_type": ""
+            }
+          );
+          $scope.openSettings();
+        }// desk cleared
+      }// end getDesks callback
+    );// dataService.getDesks call
+  };// cbStatSubmitFail
   
   //TODO Handle branch deleted
   $scope.submitStat = function( dstype )
@@ -245,35 +378,8 @@ angular.module('stat3k', ['ngCookies'])
     dataService.postStat(
       $scope.currentDesk.sp_id,
       dstype,
-      function( response )
-      {
-        //TODO this needs to handle both successful and failed posts
-        console.log( 'stat submitted...' );
-        console.log( response[0].dst_id );
-      },
-      function( response )
-      {
-        console.log( 'submit failed!!!' );
-        dataService.getDesks(
-          $scope.currentBranch.branches_id,
-          function( response )
-          {
-            $scope.desks = response.data;
-            $scope.validateCurrentDesk();
-            if( -1 === $scope.currentDesk.sp_id )
-            {
-              $scope.desks.unshift(
-                {
-                  "sp_id": -1,
-                  "sp_name": "-- Select Desk --",
-                  "desks_type": ""
-                }
-              );
-              $scope.openSettings();
-            }// desk cleared
-          }// end getDesks callback
-        );// dataService.getDesks call
-      }// failed POST request
+      cbStatSubmitSuccessful,
+      cbStatSubmitFail
     )// end dataService.postStat call
   }// submitStat
 
@@ -333,8 +439,23 @@ angular.module('stat3k', ['ngCookies'])
     }
   );
 
+  google.charts.load('current', {packages: ['corechart', 'bar']});
+  google.charts.setOnLoadCallback(initChart);
+
+  $(window).resize(function(){
+    updateChart();
+  });
+
+
 })//controller: mainCtrl
 
+
+
+/*******************************************************************************
+ *============================================================================
+ * Services
+ *============================================================================
+ ******************************************************************************/
 .service('dataService', function( $http )
 {
   // this.getCurrentDesk = function() {
@@ -359,6 +480,15 @@ angular.module('stat3k', ['ngCookies'])
     }
   };
 
+  this.getHourlyStats = function( branchAbbr, cb )
+  {
+    $http.get(
+      'api/v1/index.php?whatitdo=stats/ds/branch/'
+      + branchAbbr
+      + '/counts'
+    ).then(cb);
+  }
+
   this.postStat = function( deskId, dstype, cb_good, cb_bad )
   {
     if( deskId != -1 )
@@ -381,6 +511,13 @@ angular.module('stat3k', ['ngCookies'])
 
 })//service: dataService
 
+
+
+/*******************************************************************************
+ *============================================================================
+ * Directives
+ *============================================================================
+ ******************************************************************************/
 .directive('dailyStats', function()
 {
   return {
