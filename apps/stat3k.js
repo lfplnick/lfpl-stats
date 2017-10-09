@@ -283,11 +283,11 @@ angular.module('stat3k', ['ngCookies'])
     });
 
 
-    if( minHour < $scope.chartOptions.hAxis.viewWindow.min[0] )
-      $scope.chartOptions.hAxis.viewWindow.min[0] = minHour;
+    if( ( minHour - 1 ) < $scope.chartOptions.hAxis.viewWindow.min[0] )
+      $scope.chartOptions.hAxis.viewWindow.min[0] = minHour - 1;
 
-    if( maxHour > $scope.chartOptions.hAxis.viewWindow.max[0] )
-      $scope.chartOptions.hAxis.viewWindow.max[0] = maxHour;
+    if( ( maxHour + 1 ) > $scope.chartOptions.hAxis.viewWindow.max[0] )
+      $scope.chartOptions.hAxis.viewWindow.max[0] = maxHour + 1;
 
     $scope.chartData.removeRows( 0, $scope.chartData.getNumberOfRows() );
     for (var i = 0; i < hourlyStats.length; i++) {
@@ -297,6 +297,14 @@ angular.module('stat3k', ['ngCookies'])
 
       $scope.chartData.addRow(
         [ {v: [hour, 0, 0], f: hour + " o'clock"}, dir, info ]
+      );
+    }
+
+    console.log( hourlyStats.length );
+    if( 1 === hourlyStats.length )
+    {
+      $scope.chartData.addRow(
+        [ {v: [maxHour + 1, 0, 0], f: hour + " o'clock"}, 0, 0 ]
       );
     }
 
