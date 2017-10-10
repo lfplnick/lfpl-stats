@@ -251,6 +251,8 @@ angular.module('stat3k', ['ngCookies'])
     var statData = response.data;
     var maxHour = 0;
     var minHour = 24;
+    var sumDir = 0;
+    var sumInfo = 0;
 
     statData.forEach(function( statCount ) {
       var hour = parseInt( statCount.hour );
@@ -276,8 +278,10 @@ angular.module('stat3k', ['ngCookies'])
       if( -1 < dstype.search( 'info' ) )
       {
         hourlyStats[index].info += count;
+        sumInfo += count;
       } else if( -1 < dstype.search( 'dir' ) ) {
         hourlyStats[index].dir += count;
+        sumDir += count;
       }
 
     });
@@ -307,6 +311,9 @@ angular.module('stat3k', ['ngCookies'])
         [ {v: [maxHour + 1, 0, 0], f: hour + " o'clock"}, 0, 0 ]
       );
     }
+
+    $scope.chartOptions.title =
+      'Stats Today ( Info: ' + sumInfo + '  Directional: ' + sumDir + ' )';
 
     updateChart();
     console.log( $scope.chartData );
