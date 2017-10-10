@@ -340,7 +340,10 @@ angular.module('stat3k', ['ngCookies'])
         }
       },
       vAxis: {
-        title: 'Questions'
+        title: 'Questions',
+        viewWindow: {
+          min: 0
+        }
       }
     };
 
