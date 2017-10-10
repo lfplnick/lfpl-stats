@@ -1,0 +1,294 @@
+Below is a list of urls that are supported by version 1 of the API. 
+
+
+======================================
+Retrieving individual daily statistics
+======================================
+--------------------------------------------------------------------------------
+//TODO Update this to use branch ID instead of abbreviation.
+URL (GET)
+  https://www.example.com/api/v1/index.php?whatitdo=stats/ds/branch/{br.abbr}
+
+Use
+  Replace {br.abbr} with the branch abbreviation. This will return all daily
+  statistics for the current day.
+
+Variables
+    br.abbr:
+           Branch abbreviation
+
+Fields returned
+    ds_id: Statistic id
+
+    ds_timestamp:
+           Date and time statistic was entered
+
+    dst_name:
+           The type of question answered
+
+    sp_id: Service point ID
+
+    sp_name:
+           Service point name
+
+    branches_id:
+           Branch ID
+
+    branches_name:
+           Branch name
+
+--------------------------------------------------------------------------------
+//TODO Update this to use branch ID instead of abbreviation.
+URL (GET)
+  https://www.example.com/api/v1/index.php?whatitdo=stats/ds/branch/{br.abbr}/{yyyymmdd}
+
+Use
+  This will return the same data as above, but for the specified date. Date must
+  be formated with the four-digit year, two-digit month, and the two-digit day.
+
+Variables
+    br.abbr:
+           Branch abbreviation
+
+    yyyymmdd:
+           Date to pull statistics for. Must be formated with the four-digit
+           year, two-digit month, and the two-digit day (ex: 20170402 for April
+           2, 2017).
+
+Fields returned
+    Same as above.
+
+
+===========================
+Retrieving statistic counts
+===========================
+When counts for a single day are requested the counts are grouped by hour and
+question type. If a date range is requested then the counts are grouped by date
+and question type. Note that a count will be returned for date ranges even if
+a count is not requested.
+
+--------------------------------------------------------------------------------
+//TODO Update this to use branch ID instead of abbreviation.
+URL (GET)
+  https://www.example.com/api/v1/index.php?whatitdo=stats/ds/branch/{br.abbr}/counts
+
+Use
+  Returns hourly counts for the current day. 
+
+Variables
+    br.abbr:
+           Branch abbreviation
+
+Fields returned
+    hour:  Hour that statistics were recorded
+
+    dst_name:
+           The type of question answered
+
+    count: Number of questions answered that hour
+
+--------------------------------------------------------------------------------
+//TODO Update this to use branch ID instead of abbreviation.
+URL (GET)
+  https://www.example.com/api/v1/index.php?whatitdo=stats/ds/branch/{br.abbr}/{yyyymmdd}/counts
+
+Use
+  Returns hourly counts for the requested date. Date must be formatted with the
+  four-digit year, two-digit month, and the two-digit day.
+
+Variables
+    br.abbr:
+           Branch abbreviation
+
+    yyyymmdd:
+           Date to pull counts for. Must be formated with the four-digit year,
+           two-digit month, and the two-digit day (ex: 20170402 for April 2,
+           2017).
+
+Fields returned
+    Same as above.
+
+--------------------------------------------------------------------------------
+//TODO Update this to use branch ID instead of abbreviation.
+URL (GET)
+  https://www.example.com/api/v1/index.php?whatitdo=stats/ds/branch/{br.abbr}/{yyyymmdd-yyyymmdd}/counts
+  https://www.example.com/api/v1/index.php?whatitdo=stats/ds/branch/{br.abbr}/{yyyymmdd-yyyymmdd}
+
+Use
+  Returns daily counts for the requested date range. Note that if the start date
+  and end date are the same then it will be treated as a single date. This will
+  change the fields returned, so watch out for that.
+
+
+Variables
+    br.abbr:
+           Branch abbreviation
+
+    yyyymmdd-yyyymmdd:
+           Date range to pull counts for. Must be formatted with four-digit
+           years, two-digit months, and two-digit days. Date range is inclusive
+           and will pull data from the beginning of the start date to the end of
+           the end date.
+
+Fields returned
+    date:  Date that statistics were recorded
+
+    dst_name:
+           The type of question answered
+
+    count: Number of questions answered that day
+
+
+============================
+Posting new daily statistics
+============================
+--------------------------------------------------------------------------------
+URL (POST)
+  https://www.example.com/api/v1/index.php?whatitdo=stats/ds/stat/new
+
+Use
+  Adds a new daily statistic to the database. Timestamp info is added
+  automatically and cannot be overridden at this time. Service point and daily
+  statistic type must both be enabled for statistic to be recorded.
+
+POST Variables
+    servicepoint:
+          [required] Service point ID
+
+    dstype:
+          [required] Statistic type ID
+
+Fields returned
+    ds_id:
+          Record ID of new daily statistic.
+
+
+======================
+Retrieving branch info
+======================
+--------------------------------------------------------------------------------
+URL (GET)
+  https://www.example.com/api/v1/index.php?whatitdo=sys/branch/list
+
+Use
+  Lists active branches. Note that enabled status is not returned since this
+  only returns enabled branches.
+
+Fields returned
+    branches_id:
+           Unique branch identifier.
+
+    branches_name:
+           Name of branch.
+
+    branches_abbr:
+           Branch abbreviation.
+
+--------------------------------------------------------------------------------
+URL (GET)
+  https://www.example.com/api/v1/index.php?whatitdo=sys/branch/list/all
+
+Use
+  Lists all branches, including disabled branches.
+
+Fields returned
+    branches_id:
+           Branch ID.
+
+    branches_name:
+           Name of branch.
+
+    branches_abbr:
+           Branch abbreviation.
+
+    branches_enabled:
+           Whether or not branch is enabled. "1" for enabled, "0" for disabled.
+
+--------------------------------------------------------------------------------
+URL (GET)
+  https://www.example.com/api/v1/index.php?whatitdo=sys/branch/{br.id}/sp
+
+Use
+  Lists active service points at given branch. Note that enabled status is
+  not returned since this only returns enabled service points.
+
+Variables
+    br.id: Branch ID.
+
+Fields returned
+    sp_id: Service point ID.
+
+    sp_name:
+           Name of service point.
+
+    desks_type:
+           Type of service point (circulation, reference, computer lab, etc.)
+
+--------------------------------------------------------------------------------
+URL (GET)
+  https://www.example.com/api/v1/index.php?whatitdo=sys/branch/{br.id}/sp/all
+
+Use
+  Lists all service points at given branch.
+
+Variables
+    br.id: Branch ID
+
+Fields returned
+    sp_id: Service point ID.
+
+    sp_name:
+           Name of service point.
+
+    desks_type:
+           Type of service point (circulation, reference, computer lab, etc.)
+
+    sp_enabled:
+           Whether or not service point is enabled. "1" for enabled, "0" for
+           disabled.
+
+--------------------------------------------------------------------------------
+URL (GET)
+  https://www.example.com/api/v1/index.php?whatitdo=sys/branch/{br.id}/info
+
+Use
+  Searches for branch details by branch ID. If branch is found then
+  branch id, branch name, branch abbreviation, and enabled status is returned.
+
+Variables
+    br.id: Branch ID
+
+Fields returned
+    branches_id:
+           Branch ID.
+
+    branches_name:
+           Name of branch.
+
+    branches_abbr:
+           Branch abbreviation.
+
+    branches_enabled:
+           Whether or not branch is enabled. "1" for enabled, "0" for disabled.
+
+--------------------------------------------------------------------------------
+URL (POST)
+  https://www.example.com/api/v1/index.php?whatitdo=sys/branch
+
+Use
+  Adds a new branch to the database.
+
+POST Variables
+    branchname:
+           [required] Name of new branch
+
+    branchabbr:
+          Abbreviation of new branch
+
+    branchenabled:
+          Whether or not branch should be enabled on creation. Set to 1 to
+          enable branch or 0 to disable. Branches are disabled by default.
+
+Fields returned
+    branches_id:
+          Record ID of new branch.
