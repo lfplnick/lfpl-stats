@@ -70,7 +70,8 @@ class BranchesHandler extends RequestHandler
                     break;
 
                 default:
-                    $this->branch = ( new Branch )
+                    $this->branch = new Branch;
+                    $this->branch
                         ->setId( $nextParam )
                         ->search()
                     ;
@@ -131,9 +132,8 @@ class BranchesHandler extends RequestHandler
         {
             if( isset( $_POST['branchname'] ) )
             {
-                $this->branch = ( new Branch )
-                    ->setName( $_POST['branchname'] )
-                ;
+                $this->branch = new Branch;
+                $this->branch->setName( $_POST['branchname'] );
 
                 if( isset( $_POST['branchabbr'] ) )
                 {

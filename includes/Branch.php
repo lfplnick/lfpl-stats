@@ -89,7 +89,8 @@ class Branch {
      */
     public function create()
     {
-        $searchBranch = ( new Branch )
+        $searchBranch = new Branch;
+        $searchBranch
             ->setName( $this->branchName )
             ->search()
         ;
