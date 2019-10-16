@@ -103,11 +103,15 @@ class BranchesHandler extends RequestHandler
                 switch( $nextParam )
                 {
                     case 'sp': // generate a list of service points for the given branch
-                        $this->baseResource = 'service point';
-                        if( $this->nextParam() === false )
+                        $nextParam = $this->nextParam();
+                        if( false === $nextParam )
                         {
+                            $this->baseResource = 'list enabled service points';
                             $this->requestGood = self::REQUEST_GOOD;
-                        } else {
+                        } elseif( 'all' === $nextParam ) {
+                            $this->baseResource = 'list all service points';
+                            $this->requestGood = self::REQUEST_GOOD;
+                        }else {
                             $this->requestGood = self::REQUEST_NOGOOD;
                         }
                         break;
@@ -196,17 +200,29 @@ SQL;
             header( 'Content-Type: application/json', true, $this->responseCode );
             echo( json_encode( $branches ) );
         }// list branches
-        elseif( $this->baseResource === 'service point' )
+        elseif(
+            $this->baseResource === 'list enabled service points'
+            || $this->baseResource === 'list all service points' )
         {
             $this->getConnection();
 
-            $sql = <<<SQL
-                SELECT `ssp`.`sp_id`, `ssp`.`sp_name`, `sd`.`desks_type`
+            $select = 'SELECT `ssp`.`sp_id`, `ssp`.`sp_name`, `sd`.`desks_type`';
+
+            $from = <<<SQL
                 FROM `stat_service_points` AS `ssp`
                 LEFT JOIN `stat_desks` AS `sd` ON `ssp`.`desks_id` = `sd`.`desks_id`
                 LEFT JOIN `stat_branches` AS `sb` ON `ssp`.`branches_id` = `sb`.`branches_id`
-                WHERE `sb`.`branches_id` = :branchId ;
 SQL;
+            $where = 'WHERE `sb`.`branches_id` = :branchId';
+
+            if( 'list all service points' === $this->baseResource )
+            {
+                $select .= ', `ssp`.`sp_enabled`';
+            } else {
+                $where .= ' AND `ssp`.`sp_enabled` = 1';
+            }
+
+            $sql = $select . ' ' . $from . ' ' . $where . ';';
 
             $statement = $this->conn->prepare( $sql );
             $goForExecute = $statement->bindValue(
@@ -229,7 +245,7 @@ SQL;
             );
             $this->responseCode = 200;
             $this->sendResponse( 'json' );
-        }// baseResource === 'service point'
+        }// list service points
         elseif ( $this->baseResource === 'branch info' )
         {
             $this->response = array();

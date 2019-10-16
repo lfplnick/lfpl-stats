@@ -1,0 +1,87 @@
+
+
+/* ==========================================================================
+   Custom styles
+   ========================================================================== */
+
+
+
+/* =================================
+    Layout
+   ================================= */
+.no-top-pad {
+  padding-top: 0;
+}
+
+.q-type-header {
+  text-align: center;
+}
+
+#desk, #branch {
+  display: block;
+}
+
+
+
+/* =================================
+    Fonts
+   ================================= */
+.stat-button h3 {
+  font-size: 18px;
+}
+
+.q-type-header {
+  font-size: 28px;
+}
+
+
+
+/* =================================
+    Dev
+   ================================= */
+.outline {
+  border: #000 2pt solid;
+}
+
+
+
+/* =================================
+    Responsive
+   ================================= */
+
+/* Large */
+@media (min-width: 1200px) {
+  .q-type-header {
+    font-size=30px;
+  }
+}
+
+/* Medium */
+@media (min-width: 992px) {
+  .stat-button {
+    height: 144px;
+    padding-top: 20px;
+  }
+
+  .q-type-header {
+    text-align: right;
+    vertical-align: middle;
+    display: table-cell;
+  }
+
+  .q-type-container {
+    height: 144px;
+    display: table;
+  }
+}
+
+/* Small */
+@media (min-width: 768px) {
+  .stat-button h3 {
+    font-size: 24px;
+  }
+
+  #desk, #branch {
+    display: inline;
+  }
+}

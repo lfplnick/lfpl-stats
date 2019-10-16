@@ -221,7 +221,6 @@ abstract class RequestHandler
         }
 
         $records = $statement->fetchAll( PDO::FETCH_ASSOC );
-        1 == $records[0]['enabled'];
         $isEnabled = false;
         if( count( $records ) === 1 
             && ( 1 == $records[0]['enabled'] ) )

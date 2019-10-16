@@ -5,6 +5,7 @@ Below is a list of urls that are supported by version 1 of the API.
 Retrieving individual daily statistics
 ======================================
 --------------------------------------------------------------------------------
+//TODO Update this to use branch ID instead of abbreviation.
 URL (GET)
   https://www.example.com/api/v1/index.php?whatitdo=stats/ds/branch/{br.abbr}
 
@@ -37,6 +38,7 @@ Fields returned
            Branch name
 
 --------------------------------------------------------------------------------
+//TODO Update this to use branch ID instead of abbreviation.
 URL (GET)
   https://www.example.com/api/v1/index.php?whatitdo=stats/ds/branch/{br.abbr}/{yyyymmdd}
 
@@ -66,6 +68,7 @@ and question type. Note that a count will be returned for date ranges even if
 a count is not requested.
 
 --------------------------------------------------------------------------------
+//TODO Update this to use branch ID instead of abbreviation.
 URL (GET)
   https://www.example.com/api/v1/index.php?whatitdo=stats/ds/branch/{br.abbr}/counts
 
@@ -85,6 +88,7 @@ Fields returned
     count: Number of questions answered that hour
 
 --------------------------------------------------------------------------------
+//TODO Update this to use branch ID instead of abbreviation.
 URL (GET)
   https://www.example.com/api/v1/index.php?whatitdo=stats/ds/branch/{br.abbr}/{yyyymmdd}/counts
 
@@ -105,6 +109,7 @@ Fields returned
     Same as above.
 
 --------------------------------------------------------------------------------
+//TODO Update this to use branch ID instead of abbreviation.
 URL (GET)
   https://www.example.com/api/v1/index.php?whatitdo=stats/ds/branch/{br.abbr}/{yyyymmdd-yyyymmdd}/counts
   https://www.example.com/api/v1/index.php?whatitdo=stats/ds/branch/{br.abbr}/{yyyymmdd-yyyymmdd}
@@ -154,7 +159,7 @@ POST Variables
           [required] Statistic type ID
 
 Fields returned
-    dst_id:
+    ds_id:
           Record ID of new daily statistic.
 
 
@@ -166,40 +171,105 @@ URL (GET)
   https://www.example.com/api/v1/index.php?whatitdo=sys/branch/list
 
 Use
-  Lists all active branches. Info includes branch id, branch name and branch
-  abbreviation.
+  Lists active branches. Note that enabled status is not returned since this
+  only returns enabled branches.
+
+Fields returned
+    branches_id:
+           Unique branch identifier.
+
+    branches_name:
+           Name of branch.
+
+    branches_abbr:
+           Branch abbreviation.
 
 --------------------------------------------------------------------------------
 URL (GET)
   https://www.example.com/api/v1/index.php?whatitdo=sys/branch/list/all
 
 Use
-  Lists all branches, including disabled branches. Info includes branch id,
-  branch name, branch abbreviation, and whether branch is enabled or disabled.
+  Lists all branches, including disabled branches.
+
+Fields returned
+    branches_id:
+           Branch ID.
+
+    branches_name:
+           Name of branch.
+
+    branches_abbr:
+           Branch abbreviation.
+
+    branches_enabled:
+           Whether or not branch is enabled. "1" for enabled, "0" for disabled.
 
 --------------------------------------------------------------------------------
 URL (GET)
-  https://www.example.com/api/v1/index.php?whatitdo=sys/branch/{br.abbr}/sp
+  https://www.example.com/api/v1/index.php?whatitdo=sys/branch/{br.id}/sp
 
 Use
-  Lists all active service points at given branch. Info includes service point
-  ID, service point name, and desk type (ex. circulation, reference, etc).
+  Lists active service points at given branch. Note that enabled status is
+  not returned since this only returns enabled service points.
 
 Variables
-    br.abbr:
-           Branch abbreviation
+    br.id: Branch ID.
+
+Fields returned
+    sp_id: Service point ID.
+
+    sp_name:
+           Name of service point.
+
+    desks_type:
+           Type of service point (circulation, reference, computer lab, etc.)
 
 --------------------------------------------------------------------------------
 URL (GET)
-  https://www.example.com/api/v1/index.php?whatitdo=sys/branch/{br.abbr}/info
+  https://www.example.com/api/v1/index.php?whatitdo=sys/branch/{br.id}/sp/all
 
 Use
-  Searches for branch details by branch abbreviation. If branch is found then
+  Lists all service points at given branch.
+
+Variables
+    br.id: Branch ID
+
+Fields returned
+    sp_id: Service point ID.
+
+    sp_name:
+           Name of service point.
+
+    desks_type:
+           Type of service point (circulation, reference, computer lab, etc.)
+
+    sp_enabled:
+           Whether or not service point is enabled. "1" for enabled, "0" for
+           disabled.
+
+--------------------------------------------------------------------------------
+URL (GET)
+  https://www.example.com/api/v1/index.php?whatitdo=sys/branch/{br.id}/info
+
+Use
+  Searches for branch details by branch ID. If branch is found then
   branch id, branch name, branch abbreviation, and enabled status is returned.
 
 Variables
-    br.abbr:
-           Branch abbreviation
+    br.id: Branch ID
+
+Fields returned
+    branches_id:
+           Branch ID.
+
+    branches_name:
+           Name of branch.
+
+    branches_abbr:
+           Branch abbreviation.
+
+    branches_enabled:
+           Whether or not branch is enabled. "1" for enabled, "0" for disabled.
 
 --------------------------------------------------------------------------------
 URL (POST)

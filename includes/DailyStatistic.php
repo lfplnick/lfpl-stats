@@ -102,7 +102,7 @@ class DailyStatistic {
                 $conn->beginTransaction();
                 $success = $statement->execute();
                 if ( $success ) {
-                    $return[] = [ 'dst_id' => $conn->lastInsertId() ];
+                    $return[] = [ 'ds_id' => $conn->lastInsertId() ];
                 } else {
                     $return = false;
                 }
