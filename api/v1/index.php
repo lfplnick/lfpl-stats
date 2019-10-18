@@ -12,7 +12,11 @@ $baseResource = array_shift( $itdo );
 // $ds = new DailyStatistic( array() );
 
 if ( !isset( $apiSet ) || !isset( $baseResource ) ){
-    http_response_code( 400 );
+    if (!function_exists('http_response_code')) {
+        Shims::http_response_code( 400 );
+    } else {
+        http_response_code( 400 );
+    }
     die( 'Unknown resource.' );
 }
 
@@ -25,7 +29,11 @@ switch( strtolower( $apiSet ) ){
                 break;
 
             default:
-                http_response_code( 400 );
+                if (!function_exists('http_response_code')) {
+                    Shim::http_response_code( 400 );
+                } else {
+                    http_response_code( 400 );
+                }
                 die( 'Unknown resource.' );
                 break;
         }
@@ -43,14 +51,22 @@ switch( strtolower( $apiSet ) ){
             //     break;
 
             default:
-                http_response_code( 400 );
-                die( 'Unknown resource.' );
+                if (!function_exists('http_response_code')) {
+                    Shim::http_response_code( 400 );
+                } else {
+                    http_response_code( 400 );
+                }
+            die( 'Unknown resource.' );
                 break;
         }
         break;
 
     default:
-        http_response_code( 400 );
+        if (!function_exists('http_response_code')) {
+            Shim::http_response_code( 400 );
+        } else {
+            http_response_code( 400 );
+        }
         die( 'Unknown resource.' );
         break;
 }
@@ -58,6 +74,10 @@ switch( strtolower( $apiSet ) ){
 if( $handler->requestIsGood() === RequestHandler::REQUEST_GOOD ){
     $handler->handle();
 } else {
-    http_response_code( 400 );
+    if (!function_exists('http_response_code')) {
+        Shims::http_response_code( 400 );
+    } else {
+        http_response_code( 400 );
+    }
     die( 'Unknown resource.' );
 }
