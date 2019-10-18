@@ -34,7 +34,7 @@ class DailyStatistic {
     private $servicePointName;
 
 
-    public function __construct( array $args = [] ) {
+    public function __construct( array $args ) {
         foreach( $args as $key => $value  ){
             switch ( strtolower( $key ) ) {
                 case 'branchname':
@@ -102,7 +102,7 @@ class DailyStatistic {
                 $conn->beginTransaction();
                 $success = $statement->execute();
                 if ( $success ) {
-                    $return[] = [ 'ds_id' => $conn->lastInsertId() ];
+                    $return['ds_id'] = $conn->lastInsertId();
                 } else {
                     $return = false;
                 }
