@@ -75,15 +75,8 @@ class DailyStatistic {
      *  on a failed insert.
      */
     public function record() {
-        $connectionString =
-            "mysql:host=" . LocalSettings::$dbHost . ";" .
-            "port=" . LocalSettings::$dbPort . ";" .
-            "dbname=" . LocalSettings::$dbName;
-
-        try {
-            $conn = new PDO( $connectionString, LocalSettings::$dbUser, LocalSettings::$dbPw );
-            $conn->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
-        } catch ( PDOException $e ) {
+        $conn = Connection::getConnection();
+        if( $conn === false){
             // @todo Handle this better.
             return false;
         }
