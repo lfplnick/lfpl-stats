@@ -246,6 +246,7 @@ class DailyStatsHandler extends StatsHandler
 
         $sp_id = $_POST['servicepoint'];
         $dst_id = $_POST['dstype'];
+        $ds_sourceip = $_SERVER['REMOTE_ADDR'];
 
         if( !$this->servicePointEnabled( $sp_id ) ){
             $this->responseCode = 400;
@@ -263,7 +264,8 @@ class DailyStatsHandler extends StatsHandler
 
         $dsArgs = array(
             'servicepointid' => $sp_id,
-            'stattypeid' => $dst_id
+            'stattypeid' => $dst_id,
+            'sourceip' => $ds_sourceip
         );
         $this->ds = new DailyStatistic( $dsArgs );
     }
