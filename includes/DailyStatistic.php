@@ -22,6 +22,11 @@ class DailyStatistic {
     private $servicePointId;
 
     /**
+     * string $submitterIP IP address of computer submitting statistic.
+     */
+    private $servicePointIp;
+
+    /**
      * @var string $branchName Name of branch. Used to verify that service point
      *  hasn't changed since stat applicaton was loaded.
      */
@@ -52,6 +57,10 @@ class DailyStatistic {
                 case 'servicepointname':
                     $this->setServicePointName( $value );
                     break;
+
+                case 'sourceip':
+                    $this->setServicePointIp( $value );
+                    break;
             }
         }
     }
@@ -59,11 +68,19 @@ class DailyStatistic {
 
     public function getStatTypeId(){ return $this->statTypeId; }
     public function getServicePointId(){ return $this->servicePointId; }
+    public function getServicePointIp(){ return $this->servicePointIp; }
     public function getBranchName(){ return $this->branchName; }
     public function getServicePointName(){ return $this->servicePointName; }
 
     public function setStatTypeId( $statTypeId ){ $this->statTypeId = $statTypeId; }
     public function setServicePointId( $servicePointId ){ $this->servicePointId = $servicePointId; }
+    public function setServicePointIp( $servicePointIp ){
+        if( filter_var($servicePointIp, FILTER_VALIDATE_IP) ){
+            $this->servicePointIp = $servicePointIp;
+        } else {
+            $this->servicePointIp = '0.0.0.0';
+        }
+    }
     public function setBranchName( $branchName ){ $this->branchName = $branchName; }
     public function setServicePointName($servicePointName ){ $this->servicePointName = $servicePointName; }
 
@@ -81,11 +98,12 @@ class DailyStatistic {
             return false;
         }
 
-        $sql = "INSERT INTO stat_daily_stats ( dst_id, sp_id ) VALUES ( :dstId, :spId )";
+        $sql = "INSERT INTO stat_daily_stats ( ds_sourceip, dst_id, sp_id ) VALUES ( inet6_aton( :dsSourceIp ), :dstId, :spId )";
         $statement = $conn->prepare($sql);
 
         $goForExecute = true;
 
+        $goForExecute = $goForExecute && $statement->bindParam( ':dsSourceIp', $this->servicePointIp, PDO::PARAM_STR );
         $goForExecute = $goForExecute && $statement->bindParam( ':dstId', $this->statTypeId, PDO::PARAM_INT );
         $goForExecute = $goForExecute && $statement->bindParam( ':spId', $this->servicePointId, PDO::PARAM_INT );
 

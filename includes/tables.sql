@@ -175,6 +175,14 @@ CREATE TABLE stat_daily_stats(
     ds_timestamp DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     --
+    -- Submitter IP address.
+    --
+    -- The IP address of the computer submitting the statistic. Can hold one
+    -- IPv4 or IPv6 address using inet6_aton() for storing values and
+    -- inet6_ntoa() for retrieving.
+    ds_sourceip varbinary(16),
+
+    --
     -- Question type
     --
     -- Foreign key to stat_daily_stat_types.dst_id. This is the type of question
