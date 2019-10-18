@@ -94,7 +94,11 @@ abstract class RequestHandler
         {
             header( 'Content-Type: application/json', true, $this->responseCode );
         } else {
-            http_response_code( $this->responseCode );
+            if (!function_exists('http_response_code')) {
+                Shim::http_response_code( $this->responseCode );
+            } else {
+                http_response_code( $this->responseCode );
+            }
         }
         if( isset( $this->response ) ){
            echo $this->response;

@@ -204,7 +204,7 @@ class DailyStatsHandler extends StatsHandler
 
     public static function isDateRange( $test ){
         $regex = '/(\d{8})(?:\-(\d{8}))?/';
-        $matches = [];
+        $matches = array();
 
         // This should fail on either 0 (no match) or false (error)
         if( !preg_match( $regex, $test, $matches ) ){ return false; }
